@@ -45,4 +45,4 @@ Prueben en el navegador: http://localhost:3001/health y http://localhost:3001/us
 Ejemplo de cuerpo para POST:
 `{"nombre": "Marta Ríos", "email": "marta.rios@empresa.com", "rol": "despacho"}`
 
-Los roles válidos se configuran en el archivo .env (`ROLES=administrador,despacho,flota`).
+Los roles válidos se configuran en el archivo .env (`ROLES=administrador,comercial,produccion`).
