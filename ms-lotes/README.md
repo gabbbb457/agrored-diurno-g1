@@ -1,12 +1,8 @@
-# ms-usuarios · Plantilla del Taller 1 (Módulo 3)
+# ms-lotes · Microservicio de lotes de producción
 
-Redes y Servicios Multimedia · UAO · Microservicio de **usuarios** de la aplicación,
-con **Node.js + Express** organizado en capas. Es el microservicio común de todos los grupos
-y, en esta versión, la plantilla para construir el suyo: cópienla y adapten **todas** las capas
-a su propia entidad.
+Redes y Servicios Multimedia · UAO · Módulo 3 · AgroRed S.A.
 
-Esta es la versión del Taller 1: datos en memoria y tres operaciones. La versión completa
-(MySQL, contraseña cifrada, inicio de sesión y tokens JWT) se entrega en el Taller 3.
+Microservicio de **lotes** de la planta de AgroRed, hecho con **Node.js + Express** y organizado en capas. Es la versión del Taller 1: los datos viven en memoria y hay tres operaciones. En el Taller 2 pasará a MySQL con CRUD completo.
 
 ## Cómo ejecutarlo
 
@@ -18,7 +14,7 @@ copy .env.example .env      # en Windows (en Linux/Mac: cp .env.example .env)
 npm run dev                 # inicia y se reinicia solo al guardar cambios
 ```
 
-Prueben en el navegador: http://localhost:3001/health y http://localhost:3001/usuarios
+Pruebe en el navegador: http://localhost:3005/health y http://localhost:3005/lotes
 
 ## Capas
 
@@ -26,23 +22,37 @@ Prueben en el navegador: http://localhost:3001/health y http://localhost:3001/us
 |---|---|---|
 | src/index.js | Arranque | Lee PORT y HOST y pone el servidor a escuchar |
 | src/app.js | Configuración | Middlewares, /health, montaje de rutas, manejo de errores |
-| src/routes/usuarios.routes.js | Presentación | Método HTTP + URI → función del controlador |
-| src/controllers/usuarios.controller.js | Presentación | Lee la petición, llama al servicio, arma la respuesta |
-| src/services/usuarios.service.js | Lógica de negocio | Validaciones y reglas (email único); no conoce HTTP ni la base de datos |
-| src/repositories/usuarios.repository.js | Acceso a datos | Guarda y consulta (en memoria en el Taller 1) |
-| src/models/usuario.js | Modelo | Atributos de la entidad y su validación |
+| src/routes/lotes.routes.js | Presentación | Método HTTP + URI → función del controlador |
+| src/controllers/lotes.controller.js | Presentación | Lee la petición, llama al servicio, arma la respuesta |
+| src/services/lotes.service.js | Lógica de negocio | Validaciones y reglas (codigo_lote único); no conoce HTTP ni la base de datos |
+| src/repositories/lotes.repository.js | Acceso a datos | Guarda y consulta (en memoria en el Taller 1) |
+| src/models/lote.js | Modelo | Atributos de la entidad y su validación |
 | src/utils/http-error.js | Utilidad | Error con código de estado HTTP |
+
+## Atributos de un lote
+
+| Atributo | Tipo | Regla |
+|---|---|---|
+| id | entero | Lo asigna el servicio |
+| codigo_lote | texto | Obligatorio y único (409 si se repite) |
+| producto_id | entero | Obligatorio, entero positivo (que exista en ms-productos se valida en el Taller 3) |
+| fecha_produccion | texto | Obligatorio, formato AAAA-MM-DD |
+| cantidad | entero | Obligatorio, mayor que 0 |
+| resultado_calidad | texto | pendiente, aprobado o rechazado |
 
 ## Endpoints (Taller 1)
 
 | Método | URI | Respuesta |
 |---|---|---|
-| GET | /health | 200 `{"servicio":"ms-usuarios","estado":"ok"}` |
-| GET | /usuarios | 200 arreglo de usuarios |
-| GET | /usuarios/:id | 200 usuario · 400 id inválido · 404 no existe |
-| POST | /usuarios | 201 usuario creado · 400 datos inválidos · 409 email repetido |
+| GET | /health | 200 `{"servicio":"ms-lotes","estado":"ok"}` |
+| GET | /lotes | 200 arreglo de lotes |
+| GET | /lotes/:id | 200 lote · 400 id inválido · 404 no existe |
+| POST | /lotes | 201 lote creado · 400 datos inválidos · 409 código repetido |
 
 Ejemplo de cuerpo para POST:
-`{"nombre": "Marta Ríos", "email": "marta.rios@empresa.com", "rol": "despacho"}`
+`{"codigo_lote": "L-2026-004", "producto_id": 2, "fecha_produccion": "2026-10-25", "cantidad": 250, "resultado_calidad": "pendiente"}`
 
-Los roles válidos se configuran en el archivo .env (`ROLES=administrador,comercial,produccion`).
+Ejemplo de respuesta (hoy solo trae `producto_id`; el objeto `producto` se agrega en el Taller 3):
+`{"id": 4, "codigo_lote": "L-2026-004", "producto_id": 2, "fecha_produccion": "2026-10-25", "cantidad": 250, "resultado_calidad": "pendiente"}`
+
+Puerto: 3005. Escucha solo en 127.0.0.1.
