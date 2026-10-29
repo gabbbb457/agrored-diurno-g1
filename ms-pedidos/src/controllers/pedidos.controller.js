@@ -3,7 +3,7 @@
 // Traduce HTTP <-> servicio: lee la petición (params, body),
 // llama al servicio y arma la respuesta (código de estado + JSON).
 // =====================================================================
-const service = require('../services/usuarios.service');
+const service = require('../services/pedidos.service');
 const HttpError = require('../utils/http-error');
 
 function leerId(req) {
@@ -12,19 +12,19 @@ function leerId(req) {
   return id;
 }
 
-// GET /usuarios
+// GET /pedidos
 async function listar(req, res) {
-  const usuarios = await service.listar();
-  res.status(200).json(usuarios);
+  const pedidos = await service.listar();
+  res.status(200).json(pedidos);
 }
 
-// GET /usuarios/:id
+// GET /pedidos/:id
 async function obtener(req, res) {
-  const usuario = await service.obtener(leerId(req));
-  res.status(200).json(usuario);
+  const pedido = await service.obtener(leerId(req));
+  res.status(200).json(pedido);
 }
 
-// POST /usuarios
+// POST /pedidos
 async function crear(req, res) {
   const nuevo = await service.crear(req.body);
   res.status(201).location(`${req.baseUrl}/${nuevo.id}`).json(nuevo);
