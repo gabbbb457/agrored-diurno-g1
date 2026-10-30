@@ -3,10 +3,10 @@
 AgroRed S.A. · Redes y Servicios Multimedia · Módulo 3
 
 ## Integrantes
-- Daniela Valverde (ms-productos)
-- Miguel Angel Vanegas (ms-clientes)
-- Maria Paula Zambrano (ms-pedidos)
-- Gabriela Mellizo (ms-lotes)
+- Daniela Valverde: Danix5925 (ms-productos)
+- Miguel Angel Vanegas: MDvanegas (ms-clientes)
+- Maria Paula Zambrano: ccdfmck (ms-pedidos)
+- Gabriela Mellizo: gabbbb457 (ms-lotes)
 
 ## Tabla de Microservicios
 
