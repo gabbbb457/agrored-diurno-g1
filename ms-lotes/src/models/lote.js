@@ -1,13 +1,4 @@
-// =====================================================================
-// CAPA DE MODELO (entidad)
-// Define qué campos tiene un Usuario y qué reglas deben cumplir.
-// No sabe nada de HTTP ni de bases de datos.
-//
-// Versión del Taller 1: todavía sin contraseña. La contraseña cifrada
-// y el inicio de sesión se agregan en la versión completa (Taller 3).
-// =====================================================================
-
-// Los roles válidos vienen del archivo .env (cada empresa tiene los suyos)
+// Modelo Lote: define los atributos de un lote y cómo se validan.
 const RESULTADOS = ['pendiente', 'aprobado', 'rechazado'];
 const FECHA = /^\d{4}-\d{2}-\d{2}$/;
 
