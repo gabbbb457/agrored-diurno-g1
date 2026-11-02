@@ -5,7 +5,7 @@
 //
 // cliente_id y producto_id son referencias (ids) a registros que viven en
 // ms-clientes y ms-productos: aquí solo se guarda el id, nunca una copia.
-// created_at y updated_at los pone el servicio, el cliente no los envía.
+// created_at y updated_at los pone el servicio: el cliente no los envía.
 // =====================================================================
 
 const CENTROS = ['Bogotá', 'Cali'];
@@ -23,8 +23,10 @@ function ahora() {
     `T${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`;
 }
 
-// Devuelve una lista de errores de validación (vacía si todo está bien)
-function validarPedido(datos) {
+// Devuelve una lista de errores de validación (vacía si todo está bien).
+// Al crear, estado es opcional. Al actualizar (PUT reemplaza el pedido
+// completo) se pasa { completo: true } y estado pasa a ser obligatorio.
+function validarPedido(datos, { completo = false } = {}) {
   const errores = [];
   if (!datos || typeof datos !== 'object' || Array.isArray(datos)) {
     return ['Se esperaba un objeto JSON con los datos del pedido'];
@@ -41,14 +43,15 @@ function validarPedido(datos) {
   if (!CENTROS.includes(datos.centro_distribucion)) {
     errores.push(`centro_distribucion debe ser uno de: ${CENTROS.join(', ')}`);
   }
-  // estado es opcional: solo se valida si el cliente lo manda
-  if (datos.estado !== undefined && !ESTADOS.includes(datos.estado)) {
-    errores.push(`estado debe ser uno de: ${ESTADOS.join(', ')}`);
+  if (completo || datos.estado !== undefined) {
+    if (!ESTADOS.includes(datos.estado)) {
+      errores.push(`estado${completo ? ' es obligatorio y' : ''} debe ser uno de: ${ESTADOS.join(', ')}`);
+    }
   }
   return errores;
 }
 
-// Construye un pedido "limpio" solo con los campos permitidos
+// Construye un pedido nuevo "limpio" solo con los campos permitidos
 function construirPedido(datos) {
   const momento = ahora();
   return {
@@ -62,4 +65,17 @@ function construirPedido(datos) {
   };
 }
 
-module.exports = { validarPedido, construirPedido };
+// Construye el pedido actualizado: conserva created_at y renueva updated_at
+function construirActualizacion(datos, existente) {
+  return {
+    cliente_id: datos.cliente_id,
+    producto_id: datos.producto_id,
+    cantidad: datos.cantidad,
+    centro_distribucion: datos.centro_distribucion,
+    estado: datos.estado,
+    created_at: existente.created_at,
+    updated_at: ahora(),
+  };
+}
+
+module.exports = { ESTADOS, validarPedido, construirPedido, construirActualizacion };

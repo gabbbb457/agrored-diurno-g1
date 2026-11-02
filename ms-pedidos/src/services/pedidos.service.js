@@ -4,11 +4,15 @@
 // No sabe nada de HTTP (req/res) ni de cómo se guardan los datos.
 // =====================================================================
 const repo = require('../repositories/pedidos.repository');
-const { validarPedido, construirPedido } = require('../models/pedido');
+const { ESTADOS, validarPedido, construirPedido, construirActualizacion } = require('../models/pedido');
 const HttpError = require('../utils/http-error');
 
-async function listar() {
-  return repo.findAll();
+// filtros: { estado } viene de ?estado=... (puede ser undefined)
+async function listar(filtros = {}) {
+  if (filtros.estado !== undefined && !ESTADOS.includes(filtros.estado)) {
+    throw new HttpError(400, `estado debe ser uno de: ${ESTADOS.join(', ')}`);
+  }
+  return repo.findAll(filtros);
 }
 
 async function obtener(id) {
@@ -26,4 +30,19 @@ async function crear(datos) {
   return repo.create(construirPedido(datos));
 }
 
-module.exports = { listar, obtener, crear };
+async function actualizar(id, datos) {
+  const existente = await repo.findById(id);
+  if (!existente) throw new HttpError(404, `No existe el pedido con id ${id}`);
+
+  const errores = validarPedido(datos, { completo: true });
+  if (errores.length > 0) throw new HttpError(400, 'Datos inválidos', errores);
+
+  return repo.update(id, construirActualizacion(datos, existente));
+}
+
+async function eliminar(id) {
+  const eliminado = await repo.remove(id);
+  if (!eliminado) throw new HttpError(404, `No existe el pedido con id ${id}`);
+}
+
+module.exports = { listar, obtener, crear, actualizar, eliminar };
