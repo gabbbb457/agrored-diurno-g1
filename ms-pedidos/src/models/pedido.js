@@ -5,21 +5,22 @@
 //
 // cliente_id y producto_id son referencias (ids) a registros que viven en
 // ms-clientes y ms-productos: aquí solo se guarda el id, nunca una copia.
+// created_at y updated_at los pone el servicio, el cliente no los envía.
 // =====================================================================
 
 const CENTROS = ['Bogotá', 'Cali'];
 const ESTADOS = ['recibido', 'despachado', 'entregado'];
-const FECHA_VALIDA = /^\d{4}-\d{2}-\d{2}$/;
 
 function esEnteroPositivo(valor) {
   return Number.isInteger(valor) && valor > 0;
 }
 
-// Revisa el formato AAAA-MM-DD y que sea una fecha real (rechaza 2026-02-31)
-function esFechaValida(texto) {
-  if (typeof texto !== 'string' || !FECHA_VALIDA.test(texto)) return false;
-  const d = new Date(`${texto}T00:00:00Z`);
-  return !Number.isNaN(d.getTime()) && d.toISOString().slice(0, 10) === texto;
+// Fecha y hora actuales (hora local del equipo) como AAAA-MM-DDTHH:MM:SS
+function ahora() {
+  const d = new Date();
+  const p = (n) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}` +
+    `T${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`;
 }
 
 // Devuelve una lista de errores de validación (vacía si todo está bien)
@@ -40,25 +41,24 @@ function validarPedido(datos) {
   if (!CENTROS.includes(datos.centro_distribucion)) {
     errores.push(`centro_distribucion debe ser uno de: ${CENTROS.join(', ')}`);
   }
-  // estado y fecha son opcionales: solo se validan si el cliente los manda
+  // estado es opcional: solo se valida si el cliente lo manda
   if (datos.estado !== undefined && !ESTADOS.includes(datos.estado)) {
     errores.push(`estado debe ser uno de: ${ESTADOS.join(', ')}`);
-  }
-  if (datos.fecha !== undefined && !esFechaValida(datos.fecha)) {
-    errores.push('fecha debe tener el formato AAAA-MM-DD y ser una fecha real');
   }
   return errores;
 }
 
 // Construye un pedido "limpio" solo con los campos permitidos
 function construirPedido(datos) {
+  const momento = ahora();
   return {
     cliente_id: datos.cliente_id,
     producto_id: datos.producto_id,
     cantidad: datos.cantidad,
     centro_distribucion: datos.centro_distribucion,
     estado: datos.estado === undefined ? 'recibido' : datos.estado,
-    fecha: datos.fecha === undefined ? new Date().toISOString().slice(0, 10) : datos.fecha,
+    created_at: momento,
+    updated_at: momento,
   };
 }
 
