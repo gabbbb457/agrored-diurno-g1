@@ -13,6 +13,8 @@ const pool = mysql.createPool({
   database: process.env.DB_NAME,
   charset: 'utf8mb4',
   dateStrings: true, // DATETIME llega como texto, no como objeto Date
+  dateStrings: true, // DATETIME llega como texto, no como objeto Date
+  decimalNumbers: true, // los DECIMAL llegan como números, no como texto
   waitForConnections: true,
   connectionLimit: 10,
 });
