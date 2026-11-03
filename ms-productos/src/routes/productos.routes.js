@@ -10,7 +10,7 @@ const router = Router();
 router.get('/', controller.listar);      // listar todos los productos
 router.get('/:id', controller.obtener);  // obtener un producto por id
 router.post('/', controller.crear);      // crear un producto
-
-// Taller 2: agregar PUT /:id (actualizar) y DELETE /:id (eliminar)
+router.put('/:id', controller.actualizar);   // reemplazar un producto
+router.delete('/:id', controller.eliminar);  // eliminar un producto
 
 module.exports = router;

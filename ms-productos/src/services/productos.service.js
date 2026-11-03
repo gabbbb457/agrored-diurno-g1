@@ -7,8 +7,8 @@ const repo = require('../repositories/productos.repository');
 const { validarProducto, construirProducto } = require('../models/producto');
 const HttpError = require('../utils/http-error');
 
-async function listar() {
-  return repo.findAll();
+async function listar(filtros) {
+  return repo.findAll(filtros);
 }
 
 async function obtener(id) {
@@ -32,4 +32,30 @@ async function crear(datos) {
   return repo.create(producto);
 }
 
-module.exports = { listar, obtener, crear };
+
+async function actualizar(id, datos) {
+  // Valida igual que crear (PUT reemplaza el producto completo)
+  const errores = validarProducto(datos);
+  if (errores.length > 0) throw new HttpError(400, 'Datos inválidos', errores);
+
+  await obtener(id); // 404 si el producto no existe
+
+  const producto = construirProducto(datos);
+
+  // Misma regla de unicidad, pero el choque solo cuenta si el nombre
+  // lo tiene OTRO producto (conservar su propio nombre es válido).
+  const existente = await repo.findByNombre(producto.nombre);
+  if (existente && existente.id !== id) {
+    throw new HttpError(409, `Ya existe un producto con el nombre ${producto.nombre}`);
+  }
+
+  return repo.update(id, producto);
+}
+
+async function eliminar(id) {
+  await obtener(id); // 404 si el producto no existe
+  await repo.remove(id);
+}
+
+
+module.exports = { listar, obtener, crear, actualizar, eliminar };
