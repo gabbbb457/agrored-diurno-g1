@@ -2,14 +2,32 @@
 const RESULTADOS = ['pendiente', 'aprobado', 'rechazado'];
 const FECHA = /^\d{4}-\d{2}-\d{2}$/;
 
+// ¿El texto AAAA-MM-DD es una fecha que existe? (rechaza 2026-13-45)
+function esFechaReal(texto) {
+  if (!FECHA.test(texto)) return false;
+  const [a, m, d] = texto.split('-').map(Number);
+  const f = new Date(a, m - 1, d);
+  return f.getFullYear() === a && f.getMonth() === m - 1 && f.getDate() === d;
+}
+
+// Fecha de hoy en formato AAAA-MM-DD
+function hoy() {
+  const f = new Date();
+  const mm = String(f.getMonth() + 1).padStart(2, '0');
+  const dd = String(f.getDate()).padStart(2, '0');
+  return `${f.getFullYear()}-${mm}-${dd}`;
+}
+
 function validarLote(datos = {}) {
   const errores = [];
   if (typeof datos.codigo_lote !== 'string' || datos.codigo_lote.trim() === '')
     errores.push('codigo_lote es obligatorio');
   if (!Number.isInteger(datos.producto_id) || datos.producto_id <= 0)
     errores.push('producto_id es obligatorio y debe ser un entero positivo');
-  if (typeof datos.fecha_produccion !== 'string' || !FECHA.test(datos.fecha_produccion))
-    errores.push('fecha_produccion es obligatoria con formato AAAA-MM-DD');
+  if (typeof datos.fecha_produccion !== 'string' || !esFechaReal(datos.fecha_produccion))
+    errores.push('fecha_produccion es obligatoria, con formato AAAA-MM-DD y fecha real');
+  else if (datos.fecha_produccion > hoy())
+    errores.push('fecha_produccion no puede ser futura');
   if (!Number.isInteger(datos.cantidad) || datos.cantidad <= 0)
     errores.push('cantidad es obligatoria y debe ser un entero mayor que 0');
   if (!RESULTADOS.includes(datos.resultado_calidad))

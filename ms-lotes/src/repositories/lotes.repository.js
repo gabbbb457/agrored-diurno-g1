@@ -1,8 +1,8 @@
 // =====================================================================
 // CAPA DE ACCESO A DATOS (repositorio)
 // Única capa que sabe DÓNDE se guardan los datos.
-// Versión del Taller 1: datos en memoria (se pierden al reiniciar).
-// En el Taller 2 se reemplaza por MySQL SIN tocar las otras capas.
+// Versión en memoria (se pierden al reiniciar).
+// Más adelante se reemplaza por MySQL SIN tocar las otras capas.
 // Todas las funciones son async (devuelven promesas) para que el cambio
 // a una base de datos real no obligue a modificar la capa de servicio.
 // =====================================================================
@@ -13,7 +13,10 @@ const lotes = [
 ];
 let siguienteId = 4;
 
-async function findAll() {
+async function findAll(filtros = {}) {
+  if (filtros.resultado_calidad) {
+    return lotes.filter((l) => l.resultado_calidad === filtros.resultado_calidad);
+  }
   return lotes;
 }
 
@@ -31,4 +34,18 @@ async function create(lote) {
   return nuevo;
 }
 
-module.exports = { findAll, findById, findByCodigo, create };
+async function update(id, datos) {
+  const i = lotes.findIndex((l) => l.id === id);
+  if (i === -1) return null;
+  lotes[i] = { id, ...datos };
+  return lotes[i];
+}
+
+async function remove(id) {
+  const i = lotes.findIndex((l) => l.id === id);
+  if (i === -1) return false;
+  lotes.splice(i, 1);
+  return true;
+}
+
+module.exports = { findAll, findById, findByCodigo, create, update, remove };
