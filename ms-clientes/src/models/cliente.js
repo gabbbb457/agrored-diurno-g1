@@ -7,6 +7,14 @@
 const EMAIL_VALIDO = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const NIT_VALIDO = /^\d{6,10}-\d$/; // ej. 900123456-1
 
+// Fecha de hoy en la hora local del equipo, formato AAAA-MM-DD
+function hoy() {
+  const d = new Date();
+  const mes = String(d.getMonth() + 1).padStart(2, '0');
+  const dia = String(d.getDate()).padStart(2, '0');
+  return `${d.getFullYear()}-${mes}-${dia}`;
+}
+
 function textoNoVacio(valor) {
   return typeof valor === 'string' && valor.trim() !== '';
 }
@@ -47,7 +55,7 @@ function construirCliente(datos) {
     email: datos.email.trim().toLowerCase(),
     telefono: datos.telefono.trim(),
     ciudad: datos.ciudad.trim(),
-    fecha_registro: new Date().toISOString().slice(0, 10),
+    fecha_registro: hoy(),
     activo: datos.activo === undefined ? true : datos.activo,
   };
 }
