@@ -1,0 +1,10 @@
+$kind: http-request
+url: "{{base_url}}/clientes?ciudad=Cali"
+method: GET
+queryParams:
+  ciudad: Cali
+scripts:
+  - type: afterResponse
+    code: pm.test('Código 200', () => pm.response.to.have.status(200));
+    language: text/javascript
+order: 2000
