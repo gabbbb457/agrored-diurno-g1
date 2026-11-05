@@ -1,5 +1,0 @@
-$kind: http-request
-description: ""
-url: http://localhost:3003/clientes
-method: GET
-order: 2000

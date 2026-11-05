@@ -1,0 +1,32 @@
+$kind: collection
+description: "AgroRed · ms-clientes · puerto 3003 · Taller 2 Módulo 3. Casos 1 a 13 (CRUD) y 14 a 18 (seguridad). Correr en orden: el caso 7 guarda nuevo_id."
+variables:
+  - key: base_url
+    value: http://localhost:3003
+    disabled: false
+    secret: false
+  - key: token
+    value: ""
+    disabled: false
+    secret: false
+  - key: token_comercial
+    value: ""
+    disabled: false
+    secret: false
+  - key: token_produccion
+    value: ""
+    disabled: false
+    secret: false
+  - key: nuevo_id
+    value: "4"
+    disabled: false
+    secret: false
+  - key: auth_secret_09aw
+    secret: true
+    disabled: false
+auth:
+  - id: d58dfe4d-dfea-47f7-bdc9-2c565381885d
+    type: bearer
+    name: bearer auth
+    credentials:
+      token: "{{token}}"
