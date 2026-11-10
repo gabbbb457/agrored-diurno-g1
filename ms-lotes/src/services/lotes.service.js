@@ -2,7 +2,6 @@
 // CAPA DE SERVICIO (lógica de negocio)
 // Aplica las reglas del negocio y las validaciones.
 // No sabe nada de HTTP (req/res) ni de cómo se guardan los datos.
-// =====================================================================
 const repo = require('../repositories/lotes.repository');
 const { validarLote, construirLote } = require('../models/lote');
 const HttpError = require('../utils/http-error');
@@ -22,6 +21,8 @@ async function crear(datos) {
   if (errores.length > 0) throw new HttpError(400, 'Datos inválidos', errores);
 
   const lote = construirLote(datos);
+
+  // Regla de negocio: no puede haber dos lotes con el mismo código (409 = Conflict)
   if (await repo.findByCodigo(lote.codigo_lote)) {
     throw new HttpError(409, `Ya existe un lote con el código ${lote.codigo_lote}`);
   }
@@ -36,6 +37,8 @@ async function actualizar(id, datos) {
   if (errores.length > 0) throw new HttpError(400, 'Datos inválidos', errores);
 
   const lote = construirLote(datos);
+
+  // El código puede repetirse solo si es el del propio lote que se actualiza
   const otro = await repo.findByCodigo(lote.codigo_lote);
   if (otro && otro.id !== id) {
     throw new HttpError(409, `Ya existe un lote con el código ${lote.codigo_lote}`);
