@@ -1,15 +1,14 @@
-// Modelo Lote: define los atributos de un lote y cómo se validan.
+// Modelo Lote: define los atributos de un lote y como se validan
 const RESULTADOS = ['pendiente', 'aprobado', 'rechazado'];
 const FECHA = /^\d{4}-\d{2}-\d{2}$/;
 
-// ¿El texto AAAA-MM-DD es una fecha que existe? (rechaza 2026-13-45)
+// ¿El texto AAAA-MM-DD es una fecha que existe
 function esFechaReal(texto) {
   if (!FECHA.test(texto)) return false;
   const [a, m, d] = texto.split('-').map(Number);
   const f = new Date(a, m - 1, d);
   return f.getFullYear() === a && f.getMonth() === m - 1 && f.getDate() === d;
 }
-
 // Fecha de hoy en formato AAAA-MM-DD
 function hoy() {
   const f = new Date();
