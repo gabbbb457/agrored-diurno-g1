@@ -1,58 +1,50 @@
-// =====================================================================
 // CAPA DE ACCESO A DATOS (repositorio)
 // Única capa que sabe DÓNDE se guardan los datos.
-// Versión en memoria (se pierden al reiniciar).
-// Más adelante se reemplaza por MySQL SIN tocar las otras capas.
-// Todas las funciones son async (devuelven promesas) para que el cambio
-// a una base de datos real no obligue a modificar la capa de servicio.
-// =====================================================================
-// CAPA DE ACCESO A DATOS (repositorio)
-// Única capa que sabe DÓNDE se guardan los datos.
-// Versión en memoria (se pierden al reiniciar).
-// Más adelante se reemplaza por MySQL SIN tocar las otras capas.
-// Todas las funciones son async (devuelven promesas) para que el cambio
-// a una base de datos real no obligue a modificar la capa de servicio.
-// =====================================================================
-const lotes = [
-  { id: 1, codigo_lote: 'L-2026-001', producto_id: 2, fecha_produccion: '2026-10-20', cantidad: 500, resultado_calidad: 'pendiente' },
-  { id: 2, codigo_lote: 'L-2026-002', producto_id: 1, fecha_produccion: '2026-10-21', cantidad: 300, resultado_calidad: 'aprobado' },
-  { id: 3, codigo_lote: 'L-2026-003', producto_id: 3, fecha_produccion: '2026-10-22', cantidad: 120, resultado_calidad: 'rechazado' },
-];
-let siguienteId = 4;
+// Versión MySQL: consultas parametrizadas contra lotes_db
+
+const pool = require('../db');
 
 async function findAll(filtros = {}) {
+  let sql = 'SELECT * FROM lotes';
+  const condiciones = [];
+  const valores = [];
   if (filtros.resultado_calidad) {
-    return lotes.filter((l) => l.resultado_calidad === filtros.resultado_calidad);
+    condiciones.push('resultado_calidad = ?');
+    valores.push(filtros.resultado_calidad);
   }
-  return lotes;
+  if (condiciones.length > 0) sql += ' WHERE ' + condiciones.join(' AND ');
+  const [filas] = await pool.query(sql + ' ORDER BY id', valores);
+  return filas;
 }
 
 async function findById(id) {
-  return lotes.find((l) => l.id === id) || null;
+  const [filas] = await pool.query('SELECT * FROM lotes WHERE id = ?', [id]);
+  return filas.length > 0 ? filas[0] : null;
 }
 
 async function findByCodigo(codigo) {
-  return lotes.find((l) => l.codigo_lote.toLowerCase() === codigo.toLowerCase()) || null;
+  const [filas] = await pool.query('SELECT * FROM lotes WHERE codigo_lote = ?', [codigo]);
+  return filas.length > 0 ? filas[0] : null;
 }
 
 async function create(lote) {
-  const nuevo = { id: siguienteId++, ...lote };
-  lotes.push(nuevo);
-  return nuevo;
+  const [resultado] = await pool.query(
+    'INSERT INTO lotes (codigo_lote, producto_id, fecha_produccion, cantidad, resultado_calidad) VALUES (?, ?, ?, ?, ?)',
+    [lote.codigo_lote, lote.producto_id, lote.fecha_produccion, lote.cantidad, lote.resultado_calidad]);
+  return findById(resultado.insertId);
 }
 
-async function update(id, datos) {
-  const i = lotes.findIndex((l) => l.id === id);
-  if (i === -1) return null;
-  lotes[i] = { id, ...datos };
-  return lotes[i];
+async function update(id, lote) {
+  const [resultado] = await pool.query(
+    'UPDATE lotes SET codigo_lote = ?, producto_id = ?, fecha_produccion = ?, cantidad = ?, resultado_calidad = ? WHERE id = ?',
+    [lote.codigo_lote, lote.producto_id, lote.fecha_produccion, lote.cantidad, lote.resultado_calidad, id]);
+  if (resultado.affectedRows === 0) return null;
+  return findById(id);
 }
 
 async function remove(id) {
-  const i = lotes.findIndex((l) => l.id === id);
-  if (i === -1) return false;
-  lotes.splice(i, 1);
-  return true;
+  const [resultado] = await pool.query('DELETE FROM lotes WHERE id = ?', [id]);
+  return resultado.affectedRows > 0;
 }
 
 module.exports = { findAll, findById, findByCodigo, create, update, remove };
