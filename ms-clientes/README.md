@@ -145,4 +145,18 @@ ms-pedidos usa `GET /clientes/:id` al crear y actualizar un pedido (200 existe, 
 
 ## Pruebas
 
-Colección de Postman en `docs/ms-clientes.postman_collection.json` (Export → Collection v2.1). Variables de la colección: `base_url`, `token`, `token_comercial`, `token_produccion`, `nuevo_id`.
+Colección de Postman en `docs/ms-clientes.postman_collection.json` (Collection v2.1). Cualquier persona la puede usar:
+
+1. En Postman: **Import** → seleccionar el archivo (o arrastrarlo).
+2. Tener corriendo ms-usuarios (3001, con `ROLES=administrador,comercial,produccion`) y ms-clientes (3003), con la misma `JWT_SECRET`.
+3. Correr la carpeta **0 · Preparar tokens**: inicia sesión como administrador, crea los usuarios comercial y produccion y guarda sus tokens en las variables `token`, `token_comercial` y `token_produccion`.
+4. Correr las demás carpetas en orden (clic derecho en la carpeta → Run).
+
+| Carpeta | Casos |
+|---|---|
+| 0 · Preparar tokens | Login y usuarios de prueba |
+| Semana 1 · CRUD y pruebas | 1 a 13 |
+| Semana 2 · Seguridad | 14 a 18 |
+| Semana 2 · Relaciones | Consultas que hace ms-pedidos |
+
+Si el token vence (8 horas), se vuelve a correr la carpeta 0.

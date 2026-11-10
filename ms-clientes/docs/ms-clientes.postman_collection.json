@@ -1,8 +1,8 @@
 {
   "info": {
-    "_postman_id": "800d9594-f6f5-4d8c-ad70-ff503c865a51",
+    "_postman_id": "395f8e5e-feea-4d0e-a426-f994c3ddaa0d",
     "name": "ms-clientes",
-    "description": "AgroRed · ms-clientes · puerto 3003 · Taller 2 Módulo 3. Casos 1 a 13 (CRUD) y 14 a 18 (seguridad). Correr en orden: el caso 7 guarda nuevo_id.",
+    "description": "AgroRed · ms-clientes · puerto 3003 · Taller 2 Módulo 3.\n\nCómo usarla: 1) Import de este archivo en Postman. 2) Tener corriendo ms-usuarios (3001) y ms-clientes (3003). 3) Correr la carpeta 0 (guarda los tokens). 4) Correr las demás carpetas en orden.\n\nTodas las peticiones usan Authorization: Bearer {{token}} por defecto (configurado en la colección).",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "auth": {
@@ -16,6 +16,234 @@
     ]
   },
   "item": [
+    {
+      "name": "0 · Preparar tokens (ms-usuarios, correr primero)",
+      "description": "Requiere ms-usuarios corriendo en el puerto 3001 con ROLES=administrador,comercial,produccion. Guarda token, token_comercial y token_produccion en las variables de la colección.",
+      "item": [
+        {
+          "name": "A Login administrador",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código 200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set('token', pm.response.json().token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@empresa.com\",\n  \"password\": \"Admin2026*\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{usuarios_url}}/usuarios/login",
+              "host": [
+                "{{usuarios_url}}"
+              ],
+              "path": [
+                "usuarios",
+                "login"
+              ]
+            }
+          }
+        },
+        {
+          "name": "B Crear usuario comercial",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// 201 la primera vez; 409 si el usuario ya existía (también sirve)",
+                  "pm.test('Usuario disponible', () => pm.expect(pm.response.code).to.be.oneOf([201, 409]));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Comercial Prueba\",\n  \"email\": \"comercial@agrored.com\",\n  \"password\": \"Comercial2026*\",\n  \"rol\": \"comercial\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{usuarios_url}}/usuarios",
+              "host": [
+                "{{usuarios_url}}"
+              ],
+              "path": [
+                "usuarios"
+              ]
+            }
+          }
+        },
+        {
+          "name": "C Crear usuario produccion",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// 201 la primera vez; 409 si el usuario ya existía (también sirve)",
+                  "pm.test('Usuario disponible', () => pm.expect(pm.response.code).to.be.oneOf([201, 409]));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Produccion Prueba\",\n  \"email\": \"produccion@agrored.com\",\n  \"password\": \"Produccion2026*\",\n  \"rol\": \"produccion\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{usuarios_url}}/usuarios",
+              "host": [
+                "{{usuarios_url}}"
+              ],
+              "path": [
+                "usuarios"
+              ]
+            }
+          }
+        },
+        {
+          "name": "D Login comercial",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código 200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set('token_comercial', pm.response.json().token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"comercial@agrored.com\",\n  \"password\": \"Comercial2026*\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{usuarios_url}}/usuarios/login",
+              "host": [
+                "{{usuarios_url}}"
+              ],
+              "path": [
+                "usuarios",
+                "login"
+              ]
+            }
+          }
+        },
+        {
+          "name": "E Login produccion",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código 200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set('token_produccion', pm.response.json().token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"produccion@agrored.com\",\n  \"password\": \"Produccion2026*\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{usuarios_url}}/usuarios/login",
+              "host": [
+                "{{usuarios_url}}"
+              ],
+              "path": [
+                "usuarios",
+                "login"
+              ]
+            }
+          }
+        }
+      ]
+    },
     {
       "name": "Semana 1 · CRUD y pruebas",
       "item": [
@@ -466,54 +694,6 @@
       "name": "Semana 2 · Seguridad",
       "item": [
         {
-          "name": "00 Login administrador (ms-usuarios)",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test('Código 200', () => pm.response.to.have.status(200));",
-                  "pm.collectionVariables.set('token', pm.response.json().token);"
-                ]
-              }
-            }
-          ],
-          "request": {
-            "auth": {
-              "type": "noauth"
-            },
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"email\": \"admin@empresa.com\",\n  \"password\": \"Admin2026*\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "http://localhost:3001/usuarios/login",
-              "protocol": "http",
-              "host": [
-                "localhost"
-              ],
-              "port": "3001",
-              "path": [
-                "usuarios",
-                "login"
-              ]
-            }
-          }
-        },
-        {
           "name": "14 Petición sin token",
           "event": [
             {
@@ -676,7 +856,8 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test('Código 201', () => pm.response.to.have.status(201));"
+                  "pm.test('Código 201', () => pm.response.to.have.status(201));",
+                  "if (pm.response.code === 201) pm.collectionVariables.set('id_caso18', pm.response.json().id);"
                 ]
               }
             }
@@ -718,6 +899,100 @@
               ]
             }
           }
+        },
+        {
+          "name": "18b Limpiar: eliminar el cliente del caso 18",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código 204', () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/clientes/{{id_caso18}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "clientes",
+                "{{id_caso18}}"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Semana 2 · Relaciones (ms-clientes es consultado)",
+      "item": [
+        {
+          "name": "R1 GET /clientes/1 (lo usa ms-pedidos para validar)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/clientes/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "clientes",
+                "1"
+              ]
+            }
+          }
+        },
+        {
+          "name": "R2 GET /clientes?ids=1,2 (lo usa ms-pedidos para componer)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/clientes?ids=1,2",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "clientes"
+              ],
+              "query": [
+                {
+                  "key": "ids",
+                  "value": "1,2"
+                }
+              ]
+            }
+          }
         }
       ]
     }
@@ -742,6 +1017,14 @@
     {
       "key": "nuevo_id",
       "value": "4"
+    },
+    {
+      "key": "usuarios_url",
+      "value": "http://localhost:3001"
+    },
+    {
+      "key": "id_caso18",
+      "value": ""
     }
   ]
 }

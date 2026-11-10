@@ -3,12 +3,26 @@
 // Aquí se registran los middlewares, las rutas y el manejo de errores.
 // =====================================================================
 const express = require('express');
+const cors = require('cors');
 const clientesRoutes = require('./routes/clientes.routes');
 
 const app = express();
 
+// CORS: permite que el frontend abierto en el navegador (otro origen)
+// llame a este microservicio. En el Taller 3, detrás del gateway, no hace falta.
+app.use(cors());
+
 // Middleware: convierte el cuerpo JSON de la petición en un objeto (req.body)
 app.use(express.json());
+
+// Registro de peticiones en la terminal: deja ver las consultas que llegan
+// desde ms-pedidos (GET /clientes/:id y GET /clientes?ids=...)
+app.use((req, res, next) => {
+  res.on('finish', () => {
+    console.log(`${new Date().toISOString()} ${req.method} ${req.originalUrl} -> ${res.statusCode}`);
+  });
+  next();
+});
 
 // Endpoint de salud: permite verificar que el microservicio está vivo
 app.get('/health', (req, res) => {
