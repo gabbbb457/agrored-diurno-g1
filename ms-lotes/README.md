@@ -2,57 +2,94 @@
 
 Redes y Servicios Multimedia · UAO · Módulo 3 · AgroRed S.A.
 
-Microservicio de **lotes** de la planta de AgroRed, hecho con **Node.js + Express** y organizado en capas. Es la versión del Taller 1: los datos viven en memoria y hay tres operaciones. En el Taller 2 pasará a MySQL con CRUD completo.
+Gestiona los **lotes de producción** de la planta de AgroRed. Responsable: Gabriela Mellizo. Escucha en el puerto **3005**. Hecho con Node.js + Express, organizado en capas, con datos en MySQL.
 
 ## Cómo ejecutarlo
 
-Requisitos: Node.js LTS 22 o superior (`node -v`).
+Requisitos: Node.js LTS 22 o superior y MySQL 8.
 
+1. Crear la base de datos y su usuario (como administrador de MySQL):
+   ```sql
+   CREATE DATABASE lotes_db;
+   CREATE USER 'lotes_user'@'localhost' IDENTIFIED BY 'su-clave';
+   GRANT ALL PRIVILEGES ON lotes_db.* TO 'lotes_user'@'localhost';
+   ```
+2. Crear la tabla y los datos iniciales: ejecutar `db/schema.sql` dentro de `lotes_db`.
+3. Crear el archivo `.env` a partir de `.env.example` (`copy .env.example .env`) y poner la clave real en `DB_PASSWORD`.
+4. Instalar y arrancar:
+   ```
+   npm install
+   npm run dev
+   ```
+
+Variables del `.env`: `PORT`, `HOST`, `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD`.
+
+## Representación de un lote
+
+```json
+{
+  "id": 4,
+  "codigo_lote": "L-2026-004",
+  "producto_id": 2,
+  "fecha_produccion": "2026-10-25",
+  "cantidad": 250,
+  "resultado_calidad": "pendiente"
+}
 ```
-npm install                 # descarga Express en node_modules
-copy .env.example .env      # en Windows (en Linux/Mac: cp .env.example .env)
-npm run dev                 # inicia y se reinicia solo al guardar cambios
+
+| Atributo | Tipo | ¿Obligatorio al crear? | Reglas |
+|---|---|---|---|
+| id | entero | No | Lo asigna el servicio; el cliente nunca lo envía |
+| codigo_lote | texto | Sí | No vacío; se guarda sin espacios; único (si se repite: 409) |
+| producto_id | entero | Sí | Entero positivo. Que exista en ms-productos se valida al integrar |
+| fecha_produccion | texto | Sí | Formato AAAA-MM-DD, fecha real y no futura |
+| cantidad | entero | Sí | Mayor que 0 |
+| resultado_calidad | texto | Sí | `pendiente`, `aprobado` o `rechazado` |
+
+## Endpoints
+
+| Operación | Método | URI | Cuerpo | Respuesta exitosa | Errores |
+|---|---|---|---|---|---|
+| Salud | GET | /health | — | 200 `{"servicio":"ms-lotes","estado":"ok"}` | — |
+| Listar | GET | /lotes | — | 200 + arreglo | — |
+| Filtrar | GET | /lotes?resultado_calidad=aprobado | — | 200 + arreglo filtrado | — |
+| Obtener | GET | /lotes/:id | — | 200 + objeto | 400 id inválido · 404 |
+| Crear | POST | /lotes | JSON sin id | 201 + objeto + cabecera Location | 400 · 409 |
+| Actualizar | PUT | /lotes/:id | JSON completo sin id | 200 + objeto | 400 · 404 · 409 |
+| Eliminar | DELETE | /lotes/:id | — | 204 sin cuerpo | 400 · 404 |
+
+Los errores responden `{"error": "...", "detalles": [...]}` (la lista `detalles` solo aparece en los errores de validación).
+
+**Ejemplo: crear** — `POST /lotes`
+```json
+{
+  "codigo_lote": "L-2026-004",
+  "producto_id": 2,
+  "fecha_produccion": "2026-10-25",
+  "cantidad": 250,
+  "resultado_calidad": "pendiente"
+}
+```
+Responde `201` con el lote creado y su `id`.
+
+**Ejemplo: listar** — `GET /lotes` responde `200`:
+```json
+[
+  { "id": 1, "codigo_lote": "L-2026-001", "producto_id": 2, "fecha_produccion": "2026-10-20", "cantidad": 500, "resultado_calidad": "pendiente" },
+  { "id": 2, "codigo_lote": "L-2026-002", "producto_id": 1, "fecha_produccion": "2026-10-21", "cantidad": 300, "resultado_calidad": "aprobado" }
+]
 ```
 
-Pruebe en el navegador: http://localhost:3005/health y http://localhost:3005/lotes
+## Relaciones
 
-## Capas
+ms-lotes guarda `producto_id`, que referencia a un producto de **ms-productos**. Nadie consulta ms-lotes, así que no tiene tabla de "me consultan".
 
-| Archivo | Capa | Responsabilidad |
-|---|---|---|
-| src/index.js | Arranque | Lee PORT y HOST y pone el servidor a escuchar |
-| src/app.js | Configuración | Middlewares, /health, montaje de rutas, manejo de errores |
-| src/routes/lotes.routes.js | Presentación | Método HTTP + URI → función del controlador |
-| src/controllers/lotes.controller.js | Presentación | Lee la petición, llama al servicio, arma la respuesta |
-| src/services/lotes.service.js | Lógica de negocio | Validaciones y reglas (codigo_lote único); no conoce HTTP ni la base de datos |
-| src/repositories/lotes.repository.js | Acceso a datos | Guarda y consulta (en memoria en el Taller 1) |
-| src/models/lote.js | Modelo | Atributos de la entidad y su validación |
-| src/utils/http-error.js | Utilidad | Error con código de estado HTTP |
+| Atributo | Microservicio consultado | Para validar (al crear y actualizar) | Para componer (al consultar) | Datos que usa |
+|---|---|---|---|---|
+| producto_id | ms-productos | `GET /productos/:id` | `GET /productos?ids=…` | id, nombre |
 
-## Atributos de un lote
+*(La validación y la composición se implementan en la semana 2 del Taller 2.)*
 
-| Atributo | Tipo | Regla |
-|---|---|---|
-| id | entero | Lo asigna el servicio |
-| codigo_lote | texto | Obligatorio y único (409 si se repite) |
-| producto_id | entero | Obligatorio, entero positivo (que exista en ms-productos se valida en el Taller 3) |
-| fecha_produccion | texto | Obligatorio, formato AAAA-MM-DD |
-| cantidad | entero | Obligatorio, mayor que 0 |
-| resultado_calidad | texto | pendiente, aprobado o rechazado |
+## Pruebas
 
-## Endpoints (Taller 1)
-
-| Método | URI | Respuesta |
-|---|---|---|
-| GET | /health | 200 `{"servicio":"ms-lotes","estado":"ok"}` |
-| GET | /lotes | 200 arreglo de lotes |
-| GET | /lotes/:id | 200 lote · 400 id inválido · 404 no existe |
-| POST | /lotes | 201 lote creado · 400 datos inválidos · 409 código repetido |
-
-Ejemplo de cuerpo para POST:
-`{"codigo_lote": "L-2026-004", "producto_id": 2, "fecha_produccion": "2026-10-25", "cantidad": 250, "resultado_calidad": "pendiente"}`
-
-Ejemplo de respuesta (hoy solo trae `producto_id`; el objeto `producto` se agrega en el Taller 3):
-`{"id": 4, "codigo_lote": "L-2026-004", "producto_id": 2, "fecha_produccion": "2026-10-25", "cantidad": 250, "resultado_calidad": "pendiente"}`
-
-Puerto: 3005. Escucha solo en 127.0.0.1.
+La colección de Postman con los casos de prueba está en `docs/ms-lotes.postman_collection.json`.
