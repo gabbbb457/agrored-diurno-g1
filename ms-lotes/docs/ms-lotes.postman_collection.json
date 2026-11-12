@@ -1,9 +1,18 @@
 {
   "info": {
     "name": "ms-lotes",
-    "description": "Casos de prueba del taller 2 para ms-lotes (puerto 3005). El caso 3 (?ids=) no aplica: ningun microservicio consulta lotes. Ejecutar en orden con el servicio recien reiniciado.",
+    "description": "Casos de prueba de ms-lotes (puerto 3005). Casos 1 a 13: CRUD. Casos 14 a 18: seguridad con JWT. Casos 19 a 24: relacion con ms-productos. El caso 3 (?ids=) no aplica. Requiere las variables de coleccion token_admin, token_comercial y token_produccion (obtenidas con POST http://localhost:3001/usuarios/login). Ejecutar en orden con la base reiniciada.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
+  "auth": {
+    "type": "bearer",
+    "bearer": [{ "key": "token", "value": "{{token_admin}}", "type": "string" }]
+  },
+  "variable": [
+    { "key": "token_admin", "value": "" },
+    { "key": "token_comercial", "value": "" },
+    { "key": "token_produccion", "value": "" }
+  ],
   "item": [
     {
       "name": "00 Health (200)",
@@ -64,7 +73,7 @@
         "header": [{ "key": "Content-Type", "value": "application/json" }],
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"codigo_lote\": \"L-2026-004\",\n  \"producto_id\": 2,\n  \"fecha_produccion\": \"2026-10-25\",\n  \"cantidad\": 250,\n  \"resultado_calidad\": \"pendiente\"\n}",
+          "raw": "{\n  \"codigo_lote\": \"L-2026-004\",\n  \"producto_id\": 1,\n  \"fecha_produccion\": \"2026-10-25\",\n  \"cantidad\": 250,\n  \"resultado_calidad\": \"pendiente\"\n}",
           "options": { "raw": { "language": "json" } }
         },
         "url": { "raw": "http://localhost:3005/lotes", "protocol": "http", "host": ["localhost"], "port": "3005", "path": ["lotes"] }
@@ -77,7 +86,7 @@
         "header": [{ "key": "Content-Type", "value": "application/json" }],
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"codigo_lote\": \"L-2026-005\",\n  \"producto_id\": 2,\n  \"fecha_produccion\": \"2026-10-25\",\n  \"resultado_calidad\": \"pendiente\"\n}",
+          "raw": "{\n  \"codigo_lote\": \"L-2026-005\",\n  \"producto_id\": 1,\n  \"fecha_produccion\": \"2026-10-25\",\n  \"resultado_calidad\": \"pendiente\"\n}",
           "options": { "raw": { "language": "json" } }
         },
         "url": { "raw": "http://localhost:3005/lotes", "protocol": "http", "host": ["localhost"], "port": "3005", "path": ["lotes"] }
@@ -90,7 +99,7 @@
         "header": [{ "key": "Content-Type", "value": "application/json" }],
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"codigo_lote\": \"L-2026-001\",\n  \"producto_id\": 2,\n  \"fecha_produccion\": \"2026-10-25\",\n  \"cantidad\": 250,\n  \"resultado_calidad\": \"pendiente\"\n}",
+          "raw": "{\n  \"codigo_lote\": \"L-2026-001\",\n  \"producto_id\": 1,\n  \"fecha_produccion\": \"2026-10-25\",\n  \"cantidad\": 250,\n  \"resultado_calidad\": \"pendiente\"\n}",
           "options": { "raw": { "language": "json" } }
         },
         "url": { "raw": "http://localhost:3005/lotes", "protocol": "http", "host": ["localhost"], "port": "3005", "path": ["lotes"] }
@@ -103,7 +112,7 @@
         "header": [{ "key": "Content-Type", "value": "application/json" }],
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"codigo_lote\": \"L-2026-001\",\n  \"producto_id\": 2,\n  \"fecha_produccion\": \"2026-10-20\",\n  \"cantidad\": 600,\n  \"resultado_calidad\": \"aprobado\"\n}",
+          "raw": "{\n  \"codigo_lote\": \"L-2026-001\",\n  \"producto_id\": 1,\n  \"fecha_produccion\": \"2026-10-20\",\n  \"cantidad\": 600,\n  \"resultado_calidad\": \"aprobado\"\n}",
           "options": { "raw": { "language": "json" } }
         },
         "url": { "raw": "http://localhost:3005/lotes/1", "protocol": "http", "host": ["localhost"], "port": "3005", "path": ["lotes", "1"] }
@@ -116,7 +125,7 @@
         "header": [{ "key": "Content-Type", "value": "application/json" }],
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"codigo_lote\": \"L-2026-001\",\n  \"producto_id\": 2,\n  \"fecha_produccion\": \"2026-10-20\",\n  \"cantidad\": 600,\n  \"resultado_calidad\": \"aprobado\"\n}",
+          "raw": "{\n  \"codigo_lote\": \"L-2026-001\",\n  \"producto_id\": 1,\n  \"fecha_produccion\": \"2026-10-20\",\n  \"cantidad\": 600,\n  \"resultado_calidad\": \"aprobado\"\n}",
           "options": { "raw": { "language": "json" } }
         },
         "url": { "raw": "http://localhost:3005/lotes/999", "protocol": "http", "host": ["localhost"], "port": "3005", "path": ["lotes", "999"] }
@@ -139,13 +148,130 @@
       }
     },
     {
-      "name": "Extra Fecha futura (400)",
+      "name": "14 Sin token (401)",
+      "request": {
+        "auth": { "type": "noauth" },
+        "method": "GET",
+        "header": [],
+        "url": { "raw": "http://localhost:3005/lotes", "protocol": "http", "host": ["localhost"], "port": "3005", "path": ["lotes"] }
+      }
+    },
+    {
+      "name": "15 Token modificado (401)",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [{ "key": "token", "value": "{{token_admin}}x", "type": "string" }]
+        },
+        "method": "GET",
+        "header": [],
+        "url": { "raw": "http://localhost:3005/lotes", "protocol": "http", "host": ["localhost"], "port": "3005", "path": ["lotes"] }
+      }
+    },
+    {
+      "name": "16 GET con rol comercial (200)",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [{ "key": "token", "value": "{{token_comercial}}", "type": "string" }]
+        },
+        "method": "GET",
+        "header": [],
+        "url": { "raw": "http://localhost:3005/lotes", "protocol": "http", "host": ["localhost"], "port": "3005", "path": ["lotes"] }
+      }
+    },
+    {
+      "name": "17 POST con rol comercial sin permiso (403)",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [{ "key": "token", "value": "{{token_comercial}}", "type": "string" }]
+        },
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"codigo_lote\": \"L-2026-050\",\n  \"producto_id\": 1,\n  \"fecha_produccion\": \"2026-10-25\",\n  \"cantidad\": 100,\n  \"resultado_calidad\": \"pendiente\"\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "url": { "raw": "http://localhost:3005/lotes", "protocol": "http", "host": ["localhost"], "port": "3005", "path": ["lotes"] }
+      }
+    },
+    {
+      "name": "18 POST con rol produccion (201)",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [{ "key": "token", "value": "{{token_produccion}}", "type": "string" }]
+        },
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"codigo_lote\": \"L-2026-050\",\n  \"producto_id\": 1,\n  \"fecha_produccion\": \"2026-10-25\",\n  \"cantidad\": 100,\n  \"resultado_calidad\": \"pendiente\"\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "url": { "raw": "http://localhost:3005/lotes", "protocol": "http", "host": ["localhost"], "port": "3005", "path": ["lotes"] }
+      }
+    },
+    {
+      "name": "19 Crear con producto existente (201, con producto)",
       "request": {
         "method": "POST",
         "header": [{ "key": "Content-Type", "value": "application/json" }],
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"codigo_lote\": \"L-2026-006\",\n  \"producto_id\": 2,\n  \"fecha_produccion\": \"2030-01-01\",\n  \"cantidad\": 250,\n  \"resultado_calidad\": \"pendiente\"\n}",
+          "raw": "{\n  \"codigo_lote\": \"L-2026-060\",\n  \"producto_id\": 1,\n  \"fecha_produccion\": \"2026-10-25\",\n  \"cantidad\": 200,\n  \"resultado_calidad\": \"pendiente\"\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "url": { "raw": "http://localhost:3005/lotes", "protocol": "http", "host": ["localhost"], "port": "3005", "path": ["lotes"] }
+      }
+    },
+    {
+      "name": "20 Crear con producto que no existe (400)",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"codigo_lote\": \"L-2026-061\",\n  \"producto_id\": 999,\n  \"fecha_produccion\": \"2026-10-25\",\n  \"cantidad\": 200,\n  \"resultado_calidad\": \"pendiente\"\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "url": { "raw": "http://localhost:3005/lotes", "protocol": "http", "host": ["localhost"], "port": "3005", "path": ["lotes"] }
+      }
+    },
+    {
+      "name": "21 Obtener por id con producto (200)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": { "raw": "http://localhost:3005/lotes/1", "protocol": "http", "host": ["localhost"], "port": "3005", "path": ["lotes", "1"] }
+      }
+    },
+    {
+      "name": "22 Listar con una sola peticion ?ids= a ms-productos (200)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": { "raw": "http://localhost:3005/lotes", "protocol": "http", "host": ["localhost"], "port": "3005", "path": ["lotes"] }
+      }
+    },
+    {
+      "name": "23 Listar con ms-productos detenido (200, producto null)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": { "raw": "http://localhost:3005/lotes", "protocol": "http", "host": ["localhost"], "port": "3005", "path": ["lotes"] }
+      }
+    },
+    {
+      "name": "24 Crear con ms-productos detenido (503)",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"codigo_lote\": \"L-2026-062\",\n  \"producto_id\": 1,\n  \"fecha_produccion\": \"2026-10-25\",\n  \"cantidad\": 200,\n  \"resultado_calidad\": \"pendiente\"\n}",
           "options": { "raw": { "language": "json" } }
         },
         "url": { "raw": "http://localhost:3005/lotes", "protocol": "http", "host": ["localhost"], "port": "3005", "path": ["lotes"] }
