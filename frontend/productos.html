@@ -10,16 +10,68 @@
   <header id="encabezado"></header>
   <main>
     <h1>Productos</h1>
-    <p class="subtitulo">Pantalla en construcción · responsable: Daniela Valverde</p>
+    <p class="subtitulo" id="subtitulo">Lo que AgroRed fabrica o comercializa</p>
+
+    <div class="acciones-superiores">
+      <div>
+        <label for="filtro-categoria">Filtrar por categoría</label>
+        <select id="filtro-categoria">
+          <option value="">Todas</option>
+          <option value="fruta">fruta</option>
+          <option value="hortaliza">hortaliza</option>
+          <option value="procesado">procesado</option>
+        </select>
+      </div>
+      <div class="derecha" id="zona-nuevo"></div>
+    </div>
+
     <div class="tarjeta">
-      <p>Esta página ya tiene el encabezado, el menú y la sesión. Su responsable reemplaza este bloque por la lista, el formulario y los botones según el rol. Puede tomar como modelo <a href="clientes.html">clientes.html</a> y <code>js/clientes.js</code>.</p>
+      <table>
+        <thead>
+          <tr>
+            <th>Nombre</th><th>Categoría</th><th>Unidad</th><th>Precio</th><th id="th-acciones">Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="cuerpo-tabla"></tbody>
+      </table>
     </div>
   </main>
+
+  <!-- Formulario para crear y editar (solo administrador y produccion) -->
+  <div class="ventana" id="ventana">
+    <form class="tarjeta" id="formulario" novalidate>
+      <h2 id="titulo-formulario">Nuevo producto</h2>
+      <div class="campo"><label for="nombre">Nombre</label><input id="nombre" required></div>
+      <div class="campo">
+        <label for="categoria">Categoría</label>
+        <select id="categoria" required>
+          <option value="">Elija una</option>
+          <option value="fruta">fruta</option>
+          <option value="hortaliza">hortaliza</option>
+          <option value="procesado">procesado</option>
+        </select>
+      </div>
+      <div class="campo">
+        <label for="unidad">Unidad</label>
+        <select id="unidad" required>
+          <option value="">Elija una</option>
+          <option value="kg">kg</option>
+          <option value="caja">caja</option>
+        </select>
+      </div>
+      <div class="campo"><label for="precio">Precio (pesos, mayor que 0)</label><input id="precio" type="number" min="1" step="any" required></div>
+      <p class="error" id="errores"></p>
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px">
+        <button type="button" class="boton secundario" style="color:var(--texto)" id="cancelar">Cancelar</button>
+        <button type="submit" class="boton">Guardar</button>
+      </div>
+    </form>
+  </div>
 
   <script src="js/config.js"></script>
   <script src="js/sesion.js"></script>
   <script src="js/api.js"></script>
   <script src="js/layout.js"></script>
-  <script>pintarEncabezado('productos.html');</script>
+  <script src="js/productos.js"></script>
 </body>
 </html>
