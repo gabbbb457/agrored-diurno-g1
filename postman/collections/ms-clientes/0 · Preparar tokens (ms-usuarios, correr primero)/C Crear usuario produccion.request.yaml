@@ -1,0 +1,21 @@
+$kind: http-request
+url: "{{usuarios_url}}/usuarios"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "nombre": "Produccion Prueba",
+      "email": "produccion@agrored.com",
+      "password": "Produccion2026*",
+      "rol": "produccion"
+    }
+scripts:
+  - type: afterResponse
+    code: |-
+      // 201 la primera vez; 409 si el usuario ya existía (también sirve)
+      pm.test('Usuario disponible', () => pm.expect(pm.response.code).to.be.oneOf([201, 409]));
+    language: text/javascript
+order: 3000

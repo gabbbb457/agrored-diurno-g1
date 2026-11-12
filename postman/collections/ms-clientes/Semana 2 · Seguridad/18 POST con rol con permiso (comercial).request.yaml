@@ -19,6 +19,8 @@ auth:
     token: "{{token_comercial}}"
 scripts:
   - type: afterResponse
-    code: pm.test('Código 201', () => pm.response.to.have.status(201));
+    code: |-
+      pm.test('Código 201', () => pm.response.to.have.status(201));
+      if (pm.response.code === 201) pm.collectionVariables.set('id_caso18', pm.response.json().id);
     language: text/javascript
-order: 6000
+order: 5000

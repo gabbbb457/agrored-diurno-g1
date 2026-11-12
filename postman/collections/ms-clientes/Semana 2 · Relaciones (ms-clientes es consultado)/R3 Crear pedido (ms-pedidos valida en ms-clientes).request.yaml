@@ -1,0 +1,7 @@
+$kind: http-request
+url: http://localhost:3004/pedidos
+method: POST
+body:
+  type: json
+  content: '{ "cliente_id": 1, "producto_id": 2, "cantidad": 50, "centro_distribucion": "Cali" }'
+order: 3000

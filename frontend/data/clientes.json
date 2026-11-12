@@ -1,0 +1,5 @@
+[
+  { "id": 1, "nombre": "Distribuidora El Valle", "nit": "900123456-1", "email": "contacto@elvalle.com", "telefono": "3001234567", "ciudad": "Cali", "fecha_registro": "2026-10-01", "activo": true },
+  { "id": 2, "nombre": "Comercial Andina", "nit": "800987654-3", "email": "ventas@andina.com", "telefono": "3109876543", "ciudad": "Medellín", "fecha_registro": "2026-10-05", "activo": true },
+  { "id": 3, "nombre": "Supermercados del Pacífico", "nit": "901234567-8", "email": "info@superpacifico.com", "telefono": "3205558899", "ciudad": "Buenaventura", "fecha_registro": "2026-10-12", "activo": false }
+]

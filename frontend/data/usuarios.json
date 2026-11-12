@@ -1,0 +1,5 @@
+[
+  { "id": 1, "nombre": "Administrador General", "email": "admin@empresa.com", "rol": "administrador", "activo": true },
+  { "id": 2, "nombre": "Comercial Prueba", "email": "comercial@agrored.com", "rol": "comercial", "activo": true },
+  { "id": 3, "nombre": "Produccion Prueba", "email": "produccion@agrored.com", "rol": "produccion", "activo": true }
+]

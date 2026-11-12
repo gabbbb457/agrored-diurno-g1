@@ -6,7 +6,7 @@ workspace:
 
 cloudResources:
   collections:
-    ../postman/collections/ms-clientes: 407c2a2f-fc88-4894-93e3-92e365ad7443
+    ../postman/collections/ms-clientes: 3339265d-ae2c-44cf-a398-325fc903a033
 
 # All resources in the `postman/` folder are automatically registered in Local View.
 # Point to additional files outside the `postman/` folder to register them individually. Example:

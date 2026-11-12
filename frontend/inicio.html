@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AgroRed · Panel general</title>
+  <link rel="stylesheet" href="css/estilos.css">
+</head>
+<body>
+  <header id="encabezado"></header>
+  <main>
+    <h1>Panel general</h1>
+    <p class="subtitulo">Totales de cada entidad</p>
+    <div class="totales" id="totales"></div>
+  </main>
+
+  <script src="js/config.js"></script>
+  <script src="js/sesion.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/layout.js"></script>
+  <script>
+    pintarEncabezado('inicio.html');
+    const entidades = [
+      { recurso: 'usuarios', titulo: 'Usuarios' },
+      { recurso: 'productos', titulo: 'Productos' },
+      { recurso: 'clientes', titulo: 'Clientes' },
+      { recurso: 'pedidos', titulo: 'Pedidos' },
+      { recurso: 'lotes', titulo: 'Lotes' },
+    ];
+    Promise.all(entidades.map((e) => Api.listar(e.recurso))).then((listas) => {
+      document.getElementById('totales').innerHTML = entidades
+        .map((e, i) => `<a class="tarjeta total" href="${e.recurso}.html"><strong>${listas[i].length}</strong>${e.titulo}</a>`)
+        .join('');
+    });
+  </script>
+</body>
+</html>

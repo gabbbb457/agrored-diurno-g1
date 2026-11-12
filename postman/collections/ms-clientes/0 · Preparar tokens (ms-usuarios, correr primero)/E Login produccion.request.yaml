@@ -1,5 +1,5 @@
 $kind: http-request
-url: http://localhost:3001/usuarios/login
+url: "{{usuarios_url}}/usuarios/login"
 method: POST
 headers:
   Content-Type: application/json
@@ -7,8 +7,8 @@ body:
   type: json
   content: |-
     {
-      "email": "admin@empresa.com",
-      "password": "Admin2026*"
+      "email": "produccion@agrored.com",
+      "password": "Produccion2026*"
     }
 auth:
   type: noauth
@@ -16,6 +16,6 @@ scripts:
   - type: afterResponse
     code: |-
       pm.test('Código 200', () => pm.response.to.have.status(200));
-      pm.collectionVariables.set('token', pm.response.json().token);
+      pm.collectionVariables.set('token_produccion', pm.response.json().token);
     language: text/javascript
-order: 1000
+order: 5000

@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AgroRed · Clientes</title>
+  <link rel="stylesheet" href="css/estilos.css">
+</head>
+<body>
+  <header id="encabezado"></header>
+  <main>
+    <h1>Clientes</h1>
+    <p class="subtitulo" id="subtitulo">Empresas que le compran a AgroRed</p>
+
+    <div class="acciones-superiores">
+      <div>
+        <label for="filtro-ciudad">Filtrar por ciudad</label>
+        <select id="filtro-ciudad"><option value="">Todas</option></select>
+      </div>
+      <div class="derecha" id="zona-nuevo"></div>
+    </div>
+
+    <div class="tarjeta">
+      <table>
+        <thead>
+          <tr>
+            <th>Nombre</th><th>NIT</th><th>Email</th><th>Teléfono</th><th>Ciudad</th><th>Estado</th><th id="th-acciones">Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="cuerpo-tabla"></tbody>
+      </table>
+    </div>
+  </main>
+
+  <!-- Formulario para crear y editar (solo administrador y comercial) -->
+  <div class="ventana" id="ventana">
+    <form class="tarjeta" id="formulario" novalidate>
+      <h2 id="titulo-formulario">Nuevo cliente</h2>
+      <div class="campo"><label for="nombre">Nombre</label><input id="nombre" required></div>
+      <div class="campo"><label for="nit">NIT (formato 900123456-1)</label><input id="nit" required></div>
+      <div class="campo"><label for="email">Email</label><input id="email" type="email" required></div>
+      <div class="campo"><label for="telefono">Teléfono</label><input id="telefono" required></div>
+      <div class="campo"><label for="ciudad">Ciudad</label><input id="ciudad" required></div>
+      <div class="campo casilla"><input id="activo" type="checkbox" checked><label for="activo" style="margin:0">Activo</label></div>
+      <p class="error" id="errores"></p>
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px">
+        <button type="button" class="boton secundario" style="color:var(--texto)" id="cancelar">Cancelar</button>
+        <button type="submit" class="boton">Guardar</button>
+      </div>
+    </form>
+  </div>
+
+  <script src="js/config.js"></script>
+  <script src="js/sesion.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/layout.js"></script>
+  <script src="js/clientes.js"></script>
+</body>
+</html>

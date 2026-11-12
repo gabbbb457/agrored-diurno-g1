@@ -1,0 +1,5 @@
+[
+  { "id": 1, "nombre": "Mango Tommy", "categoria": "fruta", "unidad": "kg", "precio": 3500 },
+  { "id": 2, "nombre": "Tomate Chonto", "categoria": "hortaliza", "unidad": "kg", "precio": 2800 },
+  { "id": 3, "nombre": "Pulpa de Maracuyá", "categoria": "procesado", "unidad": "caja", "precio": 45000 }
+]

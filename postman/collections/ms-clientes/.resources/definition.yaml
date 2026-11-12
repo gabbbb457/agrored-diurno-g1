@@ -1,5 +1,10 @@
 $kind: collection
-description: "AgroRed · ms-clientes · puerto 3003 · Taller 2 Módulo 3. Casos 1 a 13 (CRUD) y 14 a 18 (seguridad). Correr en orden: el caso 7 guarda nuevo_id."
+description: |-
+  AgroRed · ms-clientes · puerto 3003 · Taller 2 Módulo 3.
+
+  Cómo usarla: 1) Import de este archivo en Postman. 2) Tener corriendo ms-usuarios (3001) y ms-clientes (3003). 3) Correr la carpeta 0 (guarda los tokens). 4) Correr las demás carpetas en orden.
+
+  Todas las peticiones usan Authorization: Bearer {{token}} por defecto (configurado en la colección).
 variables:
   - key: base_url
     value: http://localhost:3003
@@ -21,11 +26,19 @@ variables:
     value: "4"
     disabled: false
     secret: false
+  - key: usuarios_url
+    value: http://localhost:3001
+    disabled: false
+    secret: false
+  - key: id_caso18
+    value: ""
+    disabled: false
+    secret: false
   - key: auth_secret_09aw
     secret: true
     disabled: false
 auth:
-  - id: d58dfe4d-dfea-47f7-bdc9-2c565381885d
+  - id: b3740efc-2a80-4a02-af5c-5310c5ccf5ea
     type: bearer
     name: bearer auth
     credentials:
