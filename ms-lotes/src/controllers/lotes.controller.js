@@ -6,7 +6,6 @@
 const service = require('../services/lotes.service');
 const HttpError = require('../utils/http-error');
 
-// Lee el id de la URL; 400 si no es un entero positivo
 function leerId(req) {
   const id = Number(req.params.id);
   if (!Number.isInteger(id) || id <= 0) {
@@ -18,33 +17,33 @@ function leerId(req) {
 async function listar(req, res, next) {
   try {
     const filtros = { resultado_calidad: req.query.resultado_calidad };
-    res.status(200).json(await service.listar(filtros));
+    res.status(200).json(await service.listar(filtros, req.headers.authorization));
   } catch (err) { next(err); }
 }
 
 async function obtener(req, res, next) {
   try {
-    res.status(200).json(await service.obtener(leerId(req)));
+    res.status(200).json(await service.obtener(leerId(req), req.headers.authorization));
   } catch (err) { next(err); }
 }
 
 async function crear(req, res, next) {
   try {
-    const nuevo = await service.crear(req.body);
+    const nuevo = await service.crear(req.body, req.headers.authorization);
     res.status(201).location(`${req.baseUrl}/${nuevo.id}`).json(nuevo);
   } catch (err) { next(err); }
 }
 
 async function actualizar(req, res, next) {
   try {
-    res.status(200).json(await service.actualizar(leerId(req), req.body));
+    res.status(200).json(await service.actualizar(leerId(req), req.body, req.headers.authorization));
   } catch (err) { next(err); }
 }
 
 async function eliminar(req, res, next) {
   try {
     await service.eliminar(leerId(req));
-    res.status(204).end(); // 204 No Content: éxito, sin cuerpo
+    res.status(204).end();
   } catch (err) { next(err); }
 }
 
