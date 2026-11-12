@@ -1,14 +1,15 @@
-// CAPA DE PRESENTACIÓN (rutas)
-// Asocia cada método HTTP + URI con una función del controlador.
-
 const { Router } = require('express');
 const controller = require('../controllers/lotes.controller');
+const { verificarToken, requiereRol } = require('../middlewares/auth');
 
 const router = Router();
-router.get('/', controller.listar);
+
+router.use(verificarToken); // todas las rutas exigen token
+
+router.get('/', controller.listar);        // cualquier rol autenticado
 router.get('/:id', controller.obtener);
-router.post('/', controller.crear);
-router.put('/:id', controller.actualizar);
-router.delete('/:id', controller.eliminar);
+router.post('/', requiereRol('administrador', 'produccion'), controller.crear);
+router.put('/:id', requiereRol('administrador', 'produccion'), controller.actualizar);
+router.delete('/:id', requiereRol('administrador', 'produccion'), controller.eliminar);
 
 module.exports = router;
