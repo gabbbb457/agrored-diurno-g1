@@ -1,9 +1,0 @@
-$kind: http-request
-name: R1 GET /clientes/1 (lo usa ms-pedidos para validar)
-url: "{{base_url}}/clientes/1"
-method: GET
-scripts:
-  - type: afterResponse
-    code: pm.test('Código 200', () => pm.response.to.have.status(200));
-    language: text/javascript
-order: 1000
