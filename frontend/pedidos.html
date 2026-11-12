@@ -10,16 +10,70 @@
   <header id="encabezado"></header>
   <main>
     <h1>Pedidos</h1>
-    <p class="subtitulo">Pantalla en construcción · responsable: María Paula Zambrano</p>
+    <p class="subtitulo" id="subtitulo">Pedidos de los clientes de AgroRed</p>
+
+    <div class="acciones-superiores">
+      <div>
+        <label for="filtro-estado">Filtrar por estado</label>
+        <select id="filtro-estado">
+          <option value="">Todos</option>
+          <option value="recibido">recibido</option>
+          <option value="despachado">despachado</option>
+          <option value="entregado">entregado</option>
+        </select>
+      </div>
+      <div class="derecha" id="zona-nuevo"></div>
+    </div>
+
+    <!-- Aviso cuando ms-clientes o ms-productos no responden (degradación) -->
+    <p class="aviso" id="aviso" style="display:none;margin-bottom:12px"></p>
+
     <div class="tarjeta">
-      <p>Esta página ya tiene el encabezado, el menú y la sesión. Su responsable reemplaza este bloque por la lista, el formulario y los botones según el rol. Puede tomar como modelo <a href="clientes.html">clientes.html</a> y <code>js/clientes.js</code>.</p>
+      <table>
+        <thead>
+          <tr>
+            <th>N.º</th><th>Cliente</th><th>Producto</th><th>Cantidad</th><th>Centro</th><th>Estado</th><th>Fecha</th><th id="th-acciones">Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="cuerpo-tabla"></tbody>
+      </table>
     </div>
   </main>
+
+  <!-- Formulario para crear y editar (solo administrador y comercial) -->
+  <div class="ventana" id="ventana">
+    <form class="tarjeta" id="formulario" novalidate>
+      <h2 id="titulo-formulario">Nuevo pedido</h2>
+      <div class="campo"><label for="cliente_id">Cliente</label><select id="cliente_id" required></select></div>
+      <div class="campo"><label for="producto_id">Producto</label><select id="producto_id" required></select></div>
+      <div class="campo"><label for="cantidad">Cantidad</label><input id="cantidad" type="number" min="1" step="1" required></div>
+      <div class="campo">
+        <label for="centro_distribucion">Centro de distribución</label>
+        <select id="centro_distribucion" required>
+          <option value="Bogotá">Bogotá</option>
+          <option value="Cali">Cali</option>
+        </select>
+      </div>
+      <div class="campo">
+        <label for="estado">Estado</label>
+        <select id="estado" required>
+          <option value="recibido">recibido</option>
+          <option value="despachado">despachado</option>
+          <option value="entregado">entregado</option>
+        </select>
+      </div>
+      <p class="error" id="errores"></p>
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px">
+        <button type="button" class="boton secundario" style="color:var(--texto)" id="cancelar">Cancelar</button>
+        <button type="submit" class="boton">Guardar</button>
+      </div>
+    </form>
+  </div>
 
   <script src="js/config.js"></script>
   <script src="js/sesion.js"></script>
   <script src="js/api.js"></script>
   <script src="js/layout.js"></script>
-  <script>pintarEncabezado('pedidos.html');</script>
+  <script src="js/pedidos.js"></script>
 </body>
 </html>
