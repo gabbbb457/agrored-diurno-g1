@@ -7,6 +7,20 @@ const productosRoutes = require('./routes/productos.routes');
 
 const app = express();
 
+// Middleware de registro (logger): muestra en la terminal cada petición que llega,
+// con la hora, el método, la URI, el código de respuesta, cuánto tardó y quién la hizo.
+// Así se ven las peticiones que hacen ms-pedidos y ms-lotes a este microservicio.
+app.use((req, res, next) => {
+  const inicio = Date.now();
+  // 'finish' ocurre cuando la respuesta ya se envió (ahí ya se conoce el código de estado)
+  res.on('finish', () => {
+    const ms = Date.now() - inicio;
+    const origen = (req.headers['user-agent'] || 'desconocido').split(' ')[0];
+    console.log(`[${new Date().toLocaleTimeString()}] ${req.method} ${req.originalUrl} -> ${res.statusCode} (${ms} ms) · ${origen}`);
+  });
+  next(); // deja seguir la petición hacia las rutas
+});
+
 // Middleware: convierte el cuerpo JSON de la petición en un objeto (req.body)
 app.use(express.json());
 
