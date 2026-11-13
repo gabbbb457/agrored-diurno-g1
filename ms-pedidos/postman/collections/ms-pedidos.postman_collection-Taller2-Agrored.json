@@ -1,0 +1,707 @@
+{
+  "info": {
+    "_postman_id": "8700709a-3da1-490b-989d-aa86aa00f3f4",
+    "name": "ms-pedidos",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "48922743"
+  },
+  "item": [
+    {
+      "name": "Taller 1",
+      "item": [
+        {
+          "name": "1. Listar pedidos",
+          "request": {
+            "auth": {
+              "type": "inherit"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3004/pedidos/",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3004",
+              "path": [
+                "pedidos",
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "2. Filtrar por estado",
+          "request": {
+            "auth": {
+              "type": "inherit"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3004/pedidos?estado=despachado",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3004",
+              "path": [
+                "pedidos"
+              ],
+              "query": [
+                {
+                  "key": "estado",
+                  "value": "despachado",
+                  "sortOrder": 0
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "3. Obtener por ID existente",
+          "request": {
+            "auth": {
+              "type": "inherit"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3004/pedidos/1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3004",
+              "path": [
+                "pedidos",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "4. Obtener por ID inexistente",
+          "request": {
+            "auth": {
+              "type": "inherit"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3004/pedidos/99",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3004",
+              "path": [
+                "pedidos",
+                "99"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "5. Obtener por ID no numerico",
+          "request": {
+            "auth": {
+              "type": "inherit"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3004/pedidos/abc",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3004",
+              "path": [
+                "pedidos",
+                "abc"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "12. Eliminar el mismo pedido",
+          "request": {
+            "auth": {
+              "type": "inherit"
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3004/pedidos/3",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3004",
+              "path": [
+                "pedidos",
+                "3"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "11. Eliminar pedido existente",
+          "request": {
+            "auth": {
+              "type": "inherit"
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3004/pedidos/3",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3004",
+              "path": [
+                "pedidos",
+                "3"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "10. Actualizar un pedido inexistente",
+          "request": {
+            "auth": {
+              "type": "inherit"
+            },
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"cliente_id\": 3,\r\n  \"producto_id\": 2,\r\n  \"cantidad\": 30,\r\n  \"centro_distribucion\": \"Cali\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3004/pedidos/999",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3004",
+              "path": [
+                "pedidos",
+                "999"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "9. Actualizar un pedido existente",
+          "request": {
+            "auth": {
+              "type": "inherit"
+            },
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"cliente_id\": 2,\r\n  \"producto_id\": 1,\r\n  \"cantidad\": 50,\r\n  \"centro_distribucion\": \"Cali\",\r\n  \"estado\": \"despachado\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3004/pedidos/1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3004",
+              "path": [
+                "pedidos",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "8. Crear pedido datos invalidos 2",
+          "request": {
+            "auth": {
+              "type": "inherit"
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"cliente_id\": 2,\r\n  \"producto_id\": 1,\r\n  \"cantidad\": 0,\r\n  \"centro_distribucion\": \"Cali\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3004/pedidos/",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3004",
+              "path": [
+                "pedidos",
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "6. Crear pedido datos validos",
+          "request": {
+            "auth": {
+              "type": "inherit"
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"cliente_id\": 2,\r\n  \"producto_id\": 1,\r\n  \"cantidad\": 20,\r\n  \"centro_distribucion\": \"Cali\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3004/pedidos/",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3004",
+              "path": [
+                "pedidos",
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "7. Crear pedido datos invalidos",
+          "request": {
+            "auth": {
+              "type": "inherit"
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"cliente_id\": 2,\r\n  \"producto_id\": 1,\r\n  \"centro_distribucion\": \"Cali\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3004/pedidos/",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3004",
+              "path": [
+                "pedidos",
+                ""
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Taller 2",
+      "item": [
+        {
+          "name": "1. Login administrador (ms-usuarios)",
+          "request": {
+            "auth": {
+              "type": "inherit"
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "  { \"email\": \"admin@empresa.com\", \"password\": \"Admin2026*\" }",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3001/usuarios/login",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3001",
+              "path": [
+                "usuarios",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "14. Listar pedidos sin token (401)",
+          "request": {
+            "auth": {
+              "type": "inherit"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3004/pedidos",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3004",
+              "path": [
+                "pedidos"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "15. Listar pedidos con token inventado (401)",
+          "request": {
+            "auth": {
+              "type": "inherit"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3004/pedidos",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3004",
+              "path": [
+                "pedidos"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "16. Listar pedidos con token de produccion (200)",
+          "request": {
+            "auth": {
+              "type": "inherit"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3004/pedidos",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3004",
+              "path": [
+                "pedidos"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "17. Crear pedido con token de produccion (403)",
+          "request": {
+            "auth": {
+              "type": "inherit"
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "  { \"cliente_id\": 1, \"producto_id\": 1, \"cantidad\": 10, \"centro_distribucion\": \"Cali\" }",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3004/pedidos",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3004",
+              "path": [
+                "pedidos"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "18. Crear pedido con token de comercial (201)",
+          "request": {
+            "auth": {
+              "type": "inherit"
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "  { \"cliente_id\": 1, \"producto_id\": 1, \"cantidad\": 10, \"centro_distribucion\": \"Cali\" }",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3004/pedidos",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3004",
+              "path": [
+                "pedidos"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "19. Crear pedido con referencias válidas (201)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibm9tYnJlIjoiQWRtaW5pc3RyYWRvciBHZW5lcmFsIiwicm9sIjoiYWRtaW5pc3RyYWRvciIsImlhdCI6MTc5NDQ0OTgzMCwiZXhwIjoxNzk0NDc4NjMwfQ.pASeMuJ72_h0vstN72YC-v2_dG4N1kJWB_MDlfP1SlA",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"cliente_id\": 2, \"producto_id\": 2, \"cantidad\": 10, \"centro_distribucion\": \"Cali\" }",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3004/pedidos",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3004",
+              "path": [
+                "pedidos"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "20. Crear pedido con cliente inexistente (400)",
+          "request": {
+            "auth": {
+              "type": "inherit"
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"cliente_id\": 999, \"producto_id\": 2, \"cantidad\": 10, \"centro_distribucion\": \"Cali\" }",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3004/pedidos",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3004",
+              "path": [
+                "pedidos"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "21. Obtener pedido con relaciones (200, cliente y producto)",
+          "request": {
+            "auth": {
+              "type": "inherit"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3004/pedidos/1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3004",
+              "path": [
+                "pedidos",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "22. Listar pedidos con relaciones (200)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibm9tYnJlIjoiQWRtaW5pc3RyYWRvciBHZW5lcmFsIiwicm9sIjoiYWRtaW5pc3RyYWRvciIsImlhdCI6MTc5NDQ0OTgzMCwiZXhwIjoxNzk0NDc4NjMwfQ.pASeMuJ72_h0vstN72YC-v2_dG4N1kJWB_MDlfP1SlA",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3004/pedidos",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3004",
+              "path": [
+                "pedidos"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "23. Listar con ms-clientes detenido (200 con null)",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibm9tYnJlIjoiQWRtaW5pc3RyYWRvciBHZW5lcmFsIiwicm9sIjoiYWRtaW5pc3RyYWRvciIsImlhdCI6MTc5NDQ0OTgzMCwiZXhwIjoxNzk0NDc4NjMwfQ.pASeMuJ72_h0vstN72YC-v2_dG4N1kJWB_MDlfP1SlA",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3004/pedidos",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3004",
+              "path": [
+                "pedidos"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "24. Crear con ms-clientes detenido (503)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibm9tYnJlIjoiQWRtaW5pc3RyYWRvciBHZW5lcmFsIiwicm9sIjoiYWRtaW5pc3RyYWRvciIsImlhdCI6MTc5NDQ0OTgzMCwiZXhwIjoxNzk0NDc4NjMwfQ.pASeMuJ72_h0vstN72YC-v2_dG4N1kJWB_MDlfP1SlA",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"cliente_id\": 3, \"producto_id\": 1, \"cantidad\": 50, \"centro_distribucion\": \"Bogotá\" }",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3004/pedidos",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3004",
+              "path": [
+                "pedidos"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
