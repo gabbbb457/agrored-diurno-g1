@@ -1,4 +1,0 @@
-$kind: http-request
-url: http://localhost:3004/pedidos
-method: GET
-order: 4000
