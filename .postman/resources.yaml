@@ -1,0 +1,8 @@
+workspace:
+  id: ecadd605-8849-4fc0-8679-9155396a969a
+
+# Each entry here maps a local resource to one or more corresponding objects in Postman Cloud
+
+cloudResources:
+  collections:
+    ../postman/collections/ms-clientes (Taller 3 · gateway): df144e12-00b9-4220-8142-383baf8a9e2e

@@ -1,0 +1,21 @@
+$kind: http-request
+url: "{{base_url}}/clientes/{{nuevo_id}}"
+method: PUT
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "nombre": "Ferretería Central SAS",
+      "nit": "900555111-2",
+      "email": "ferre@central.com",
+      "telefono": "3151112233",
+      "ciudad": "Palmira",
+      "activo": false
+    }
+scripts:
+  - type: afterResponse
+    code: pm.test('Código 200', () => pm.response.to.have.status(200));
+    language: text/javascript
+order: 10000

@@ -1,0 +1,20 @@
+$kind: http-request
+url: "{{base_url}}/usuarios/1"
+method: PUT
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "nombre": "Administrador General",
+      "email": "admin@empresa.com",
+      "rol": "administrador",
+      "activo": true,
+      "password": "AdminAgro2026"
+    }
+scripts:
+  - type: afterResponse
+    code: pm.test('Código 200', () => pm.response.to.have.status(200));
+    language: text/javascript
+order: 2000

@@ -1,0 +1,20 @@
+$kind: http-request
+url: "{{base_url}}/lotes"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "codigo_lote": "L-{{$timestamp}}",
+      "producto_id": 1,
+      "fecha_produccion": "2026-11-10",
+      "cantidad": 200,
+      "resultado_calidad": "pendiente"
+    }
+scripts:
+  - type: afterResponse
+    code: pm.test('Código 201', () => pm.response.to.have.status(201));
+    language: text/javascript
+order: 5000

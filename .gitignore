@@ -149,5 +149,5 @@ vite.config.ts.timestamp-*
 .turbo
 
 # Archivos internos de Postman (las colecciones van en ms-<recurso>/docs/)
-.postman/
-postman/
+#.postman/
+#postman/

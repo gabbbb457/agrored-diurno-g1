@@ -1,0 +1,20 @@
+$kind: http-request
+url: "{{base_url}}/clientes/999"
+method: PUT
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "nombre": "Ferretería Central",
+      "nit": "900555111-7",
+      "email": "ferre@central.com",
+      "telefono": "3151112233",
+      "ciudad": "Palmira"
+    }
+scripts:
+  - type: afterResponse
+    code: pm.test('Código 404', () => pm.response.to.have.status(404));
+    language: text/javascript
+order: 11000

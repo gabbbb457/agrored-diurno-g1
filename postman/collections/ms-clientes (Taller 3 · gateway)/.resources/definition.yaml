@@ -1,0 +1,44 @@
+$kind: collection
+description: |-
+  AgroRed · ms-clientes · Taller 3 (a través del gateway http://app.agrored.local/api).
+
+  1) Carpeta 0: A (login con Admin2026*), A2 cambia la contraseña a AdminAgro2026; después cambie en A la contraseña a AdminAgro2026. B y C crean usuarios (201 o 409), D y E guardan sus tokens.
+  2) Correr las demás carpetas en orden.
+variables:
+  - key: base_url
+    value: http://app.agrored.local/api
+    disabled: false
+    secret: false
+  - key: token
+    value: ""
+    disabled: false
+    secret: false
+  - key: token_comercial
+    value: ""
+    disabled: false
+    secret: false
+  - key: token_produccion
+    value: ""
+    disabled: false
+    secret: false
+  - key: nuevo_id
+    value: "4"
+    disabled: false
+    secret: false
+  - key: usuarios_url
+    value: http://app.agrored.local/api
+    disabled: false
+    secret: false
+  - key: id_caso18
+    value: ""
+    disabled: false
+    secret: false
+  - key: auth_secret_09aw
+    secret: true
+    disabled: false
+auth:
+  - id: aedc2ff3-6a20-41f7-bc4f-89303de6f081
+    type: bearer
+    name: bearer auth
+    credentials:
+      token: "{{token}}"
