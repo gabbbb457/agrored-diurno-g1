@@ -46,20 +46,64 @@ const Api = {
 };
 
 // ---- Taller 3: petición real con el token en la cabecera Authorization
+// Todas las pantallas pasan por aquí, así que los errores se muestran igual
+// en toda la aplicación: error.message ya trae un texto listo para el usuario.
 async function pedirApi(metodo, ruta, cuerpo) {
-  const respuesta = await fetch(`${CONFIG.API_URL}${ruta}`, {
-    method: metodo,
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${Sesion.token()}`,
-    },
-    body: cuerpo ? JSON.stringify(cuerpo) : undefined,
-  });
-  if (respuesta.status === 401) Sesion.cerrar(); // token vencido: volver a entrar
+  let respuesta;
+  try {
+    respuesta = await fetch(`${CONFIG.API_URL}${ruta}`, {
+      method: metodo,
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${Sesion.token()}`,
+      },
+      body: cuerpo ? JSON.stringify(cuerpo) : undefined,
+    });
+  } catch (e) {
+    throw errorDeApi(0, null); // sin red o servidor apagado
+  }
+  if (respuesta.status === 401) {
+    Sesion.cerrar(); // sin sesión o token vencido: volver a entrar
+    throw errorDeApi(401, null);
+  }
   if (respuesta.status === 204) return null;
-  const json = await respuesta.json();
-  if (!respuesta.ok) throw new Error(json.error || `Error ${respuesta.status}`);
+
+  let json = null;
+  try {
+    json = await respuesta.json();
+  } catch (e) {
+    /* respuesta sin JSON (por ejemplo, el 503 que genera Apache) */
+  }
+  if (!respuesta.ok) throw errorDeApi(respuesta.status, json);
   return json;
+}
+
+// Convierte el código HTTP y el cuerpo de error de la API en un mensaje claro
+function errorDeApi(status, json) {
+  const detalle = json && json.error ? json.error : '';
+  const lista = json && Array.isArray(json.detalles) && json.detalles.length
+    ? ` (${json.detalles.join('; ')})` : '';
+  let mensaje;
+  if (status === 0) {
+    mensaje = 'No se pudo conectar con el servidor. Revisa la conexión e inténtalo de nuevo.';
+  } else if (status === 400) {
+    mensaje = `Datos no válidos (400): ${detalle || 'revisa la información enviada'}${lista}`;
+  } else if (status === 401) {
+    mensaje = 'Tu sesión terminó (401). Inicia sesión de nuevo.';
+  } else if (status === 403) {
+    mensaje = `No tienes permiso para realizar esta acción (403).${detalle ? ' ' + detalle : ''}`;
+  } else if (status === 404) {
+    mensaje = `No se encontró lo que buscabas (404).${detalle ? ' ' + detalle : ''}`;
+  } else if (status === 409) {
+    mensaje = `Conflicto (409): ${detalle || 'ya existe un registro con esos datos'}`;
+  } else if (status === 502 || status === 503 || status === 504) {
+    mensaje = `El servicio no está disponible en este momento (${status}). Inténtalo de nuevo más tarde.${detalle ? ' ' + detalle : ''}`;
+  } else {
+    mensaje = detalle || `Error ${status}`;
+  }
+  const error = new Error(mensaje);
+  error.status = status;
+  return error;
 }
 
 // ---- Taller 2: datos de ejemplo (frontend/data/<recurso>.json)

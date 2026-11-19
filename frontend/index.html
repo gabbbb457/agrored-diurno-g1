@@ -13,22 +13,14 @@
       <p class="subtitulo">Inicio de sesión</p>
       <div class="campo">
         <label for="email">Correo</label>
-        <input id="email" type="email" value="admin@empresa.com" required>
+        <input id="email" type="email" autocomplete="username" required>
       </div>
       <div class="campo">
         <label for="password">Contraseña</label>
-        <input id="password" type="password" value="Admin2026*" required>
+        <input id="password" type="password" autocomplete="current-password" required>
       </div>
-      <div class="campo">
-        <label for="rol">Entrar como (simulado en el Taller 2)</label>
-        <select id="rol">
-          <option value="administrador">administrador</option>
-          <option value="comercial">comercial</option>
-          <option value="produccion">produccion</option>
-        </select>
-      </div>
-      <p class="aviso">Inicio de sesión simulado: se elige el rol. En el Taller 3 se reemplaza por POST /usuarios/login, que devuelve el token y el rol real.</p>
-      <button class="boton" type="submit" style="width:100%;margin-top:12px">Entrar</button>
+      <p class="error" id="error-login" role="alert"></p>
+      <button class="boton" id="entrar" type="submit" style="width:100%;margin-top:12px">Entrar</button>
     </form>
   </div>
 
@@ -37,15 +29,47 @@
   <script>
     // Si ya hay sesión, ir directo a la página de inicio del rol
     const actual = Sesion.leer();
-    if (actual) window.location.href = Sesion.paginaDeInicio(actual.rol);
+    if (actual && MENU_POR_ROL[actual.rol]) window.location.href = Sesion.paginaDeInicio(actual.rol);
 
-    document.getElementById('formulario-login').addEventListener('submit', (evento) => {
+    const formulario = document.getElementById('formulario-login');
+    const mensaje = document.getElementById('error-login');
+    const boton = document.getElementById('entrar');
+
+    // Inicio de sesión real: POST /api/usuarios/login (ms-usuarios, a través del gateway)
+    formulario.addEventListener('submit', async (evento) => {
       evento.preventDefault();
-      const rol = document.getElementById('rol').value;
-      const nombres = { administrador: 'Administrador General', comercial: 'Comercial Prueba', produccion: 'Produccion Prueba' };
-      // Taller 3: aquí va el POST /usuarios/login y se guarda el token que responde
-      Sesion.guardar({ nombre: nombres[rol], email: document.getElementById('email').value, rol, token: null });
-      window.location.href = Sesion.paginaDeInicio(rol);
+      mensaje.textContent = '';
+      boton.disabled = true;
+      try {
+        const respuesta = await fetch(`${CONFIG.API_URL}/usuarios/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: document.getElementById('email').value.trim(),
+            password: document.getElementById('password').value,
+          }),
+        });
+        if (respuesta.status === 400 || respuesta.status === 401) {
+          mensaje.textContent = 'Email o contraseña incorrectos';
+          return;
+        }
+        if (!respuesta.ok) {
+          mensaje.textContent = `No se pudo iniciar sesión (${respuesta.status}). Inténtalo de nuevo más tarde.`;
+          return;
+        }
+        const { token, usuario } = await respuesta.json();
+        if (!MENU_POR_ROL[usuario.rol]) {
+          mensaje.textContent = `Tu rol (${usuario.rol}) no tiene pantallas asignadas`;
+          return;
+        }
+        // Se guardan el token y los datos del usuario (nombre y rol) solo en esta pestaña
+        Sesion.guardar({ nombre: usuario.nombre, email: usuario.email, rol: usuario.rol, token });
+        window.location.href = Sesion.paginaDeInicio(usuario.rol);
+      } catch (error) {
+        mensaje.textContent = 'No se pudo conectar con el servidor. Inténtalo de nuevo.';
+      } finally {
+        boton.disabled = false;
+      }
     });
   </script>
 </body>

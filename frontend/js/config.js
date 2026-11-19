@@ -4,8 +4,10 @@
 // Taller 3: USAR_DATOS_EJEMPLO = false y API_URL = dirección del gateway
 // =====================================================================
 const CONFIG = {
-  USAR_DATOS_EJEMPLO: true,
-  API_URL: 'http://localhost', // Taller 3: la dirección del gateway Apache
+  USAR_DATOS_EJEMPLO: false,
+  // Ruta relativa: el frontend y la API se sirven desde el mismo nombre
+  // (http://app.agrored.com), así que no hace falta CORS ni el puerto.
+  API_URL: '/api',
 };
 
 // Tabla de permisos del Taller 1: quién crea, modifica y elimina cada entidad.

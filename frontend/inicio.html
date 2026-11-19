@@ -27,11 +27,19 @@
       { recurso: 'pedidos', titulo: 'Pedidos' },
       { recurso: 'lotes', titulo: 'Lotes' },
     ];
-    Promise.all(entidades.map((e) => Api.listar(e.recurso))).then((listas) => {
+    
+    // allSettled: si un microservicio no responde, su tarjeta muestra "—" y las demás siguen
+    Promise.allSettled(entidades.map((e) => Api.listar(e.recurso))).then((resultados) => {
       document.getElementById('totales').innerHTML = entidades
-        .map((e, i) => `<a class="tarjeta total" href="${e.recurso}.html"><strong>${listas[i].length}</strong>${e.titulo}</a>`)
+        .map((e, i) => {
+          const r = resultados[i];
+          const total = r.status === 'fulfilled' ? r.value.length : '—';
+          const ayuda = r.status === 'fulfilled' ? '' : ` title="${escapar(r.reason.message)}"`;
+          return `<a class="tarjeta total" href="${e.recurso}.html"${ayuda}><strong>${total}</strong>${e.titulo}</a>`;
+        })
         .join('');
     });
+
   </script>
 </body>
 </html>
