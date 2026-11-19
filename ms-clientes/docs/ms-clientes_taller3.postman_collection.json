@@ -1,0 +1,1208 @@
+{
+  "info": {
+    "_postman_id": "fad05f40-9f75-4f8e-96f0-c83257d3b37e",
+    "name": "ms-clientes (Taller 3 · gateway)",
+    "description": "AgroRed · ms-clientes · Taller 3 (a través del gateway http://app.agrored.local/api).\n\n1) Carpeta 0: A (login con Admin2026*), A2 cambia la contraseña a AdminAgro2026; después cambie en A la contraseña a AdminAgro2026. B y C crean usuarios (201 o 409), D y E guardan sus tokens.\n2) Correr las demás carpetas en orden.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "0 · Preparar tokens (ms-usuarios, correr primero)",
+      "description": "Requiere ms-usuarios corriendo en el puerto 3001 con ROLES=administrador,comercial,produccion. Guarda token, token_comercial y token_produccion en las variables de la colección.",
+      "item": [
+        {
+          "name": "A Login administrador",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código 200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set('token', pm.response.json().token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@empresa.com\",\n  \"password\": \"Admin2026*\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{usuarios_url}}/usuarios/login",
+              "host": [
+                "{{usuarios_url}}"
+              ],
+              "path": [
+                "usuarios",
+                "login"
+              ]
+            }
+          }
+        },
+        {
+          "name": "A2 Cambiar contraseña del administrador (Taller 3)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/usuarios/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "usuarios",
+                "1"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Administrador General\",\n  \"email\": \"admin@empresa.com\",\n  \"rol\": \"administrador\",\n  \"activo\": true,\n  \"password\": \"AdminAgro2026\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "B Crear usuario comercial",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// 201 la primera vez; 409 si el usuario ya existía (también sirve)",
+                  "pm.test('Usuario disponible', () => pm.expect(pm.response.code).to.be.oneOf([201, 409]));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Comercial Prueba\",\n  \"email\": \"comercial@agrored.com\",\n  \"password\": \"Comercial2026*\",\n  \"rol\": \"comercial\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{usuarios_url}}/usuarios",
+              "host": [
+                "{{usuarios_url}}"
+              ],
+              "path": [
+                "usuarios"
+              ]
+            }
+          }
+        },
+        {
+          "name": "C Crear usuario produccion",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// 201 la primera vez; 409 si el usuario ya existía (también sirve)",
+                  "pm.test('Usuario disponible', () => pm.expect(pm.response.code).to.be.oneOf([201, 409]));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Produccion Prueba\",\n  \"email\": \"produccion@agrored.com\",\n  \"password\": \"Produccion2026*\",\n  \"rol\": \"produccion\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{usuarios_url}}/usuarios",
+              "host": [
+                "{{usuarios_url}}"
+              ],
+              "path": [
+                "usuarios"
+              ]
+            }
+          }
+        },
+        {
+          "name": "D Login comercial",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código 200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set('token_comercial', pm.response.json().token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"comercial@agrored.com\",\n  \"password\": \"Comercial2026*\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{usuarios_url}}/usuarios/login",
+              "host": [
+                "{{usuarios_url}}"
+              ],
+              "path": [
+                "usuarios",
+                "login"
+              ]
+            }
+          }
+        },
+        {
+          "name": "E Login produccion",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código 200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set('token_produccion', pm.response.json().token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"produccion@agrored.com\",\n  \"password\": \"Produccion2026*\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{usuarios_url}}/usuarios/login",
+              "host": [
+                "{{usuarios_url}}"
+              ],
+              "path": [
+                "usuarios",
+                "login"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Semana 1 · CRUD y pruebas",
+      "item": [
+        {
+          "name": "01 Listar todos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/clientes",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "clientes"
+              ]
+            }
+          }
+        },
+        {
+          "name": "02 Filtrar por ciudad",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/clientes?ciudad=Cali",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "clientes"
+              ],
+              "query": [
+                {
+                  "key": "ciudad",
+                  "value": "Cali"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "03 Consultar por lotes ids=1,3",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/clientes?ids=1,3",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "clientes"
+              ],
+              "query": [
+                {
+                  "key": "ids",
+                  "value": "1,3"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "04 Obtener cliente existente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/clientes/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "clientes",
+                "1"
+              ]
+            }
+          }
+        },
+        {
+          "name": "05 Obtener id que no existe",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código 404', () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/clientes/999",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "clientes",
+                "999"
+              ]
+            }
+          }
+        },
+        {
+          "name": "06 Obtener id no numérico",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/clientes/abc",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "clientes",
+                "abc"
+              ]
+            }
+          }
+        },
+        {
+          "name": "07 Crear con datos válidos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código 201', () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set('nuevo_id', pm.response.json().id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/clientes",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "clientes"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Ferretería Central\",\n  \"nit\": \"900555111-2\",\n  \"email\": \"ferre@central.com\",\n  \"telefono\": \"3151112233\",\n  \"ciudad\": \"Palmira\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "08 Crear sin atributo obligatorio (nombre)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/clientes",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "clientes"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nit\": \"900555111-9\",\n  \"email\": \"ferre@central.com\",\n  \"telefono\": \"3151112233\",\n  \"ciudad\": \"Palmira\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "09 Crear con NIT repetido (regla de negocio)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/clientes",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "clientes"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Otra empresa\",\n  \"nit\": \"900123456-1\",\n  \"email\": \"ferre@central.com\",\n  \"telefono\": \"3151112233\",\n  \"ciudad\": \"Palmira\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "10 Actualizar cliente existente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/clientes/{{nuevo_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "clientes",
+                "{{nuevo_id}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Ferretería Central SAS\",\n  \"nit\": \"900555111-2\",\n  \"email\": \"ferre@central.com\",\n  \"telefono\": \"3151112233\",\n  \"ciudad\": \"Palmira\",\n  \"activo\": false\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "11 Actualizar id que no existe",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código 404', () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/clientes/999",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "clientes",
+                "999"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Ferretería Central\",\n  \"nit\": \"900555111-7\",\n  \"email\": \"ferre@central.com\",\n  \"telefono\": \"3151112233\",\n  \"ciudad\": \"Palmira\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "12 Eliminar cliente existente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código 204', () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/clientes/{{nuevo_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "clientes",
+                "{{nuevo_id}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "13 Eliminar el mismo cliente otra vez",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código 404', () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/clientes/{{nuevo_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "clientes",
+                "{{nuevo_id}}"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Semana 2 · Seguridad",
+      "item": [
+        {
+          "name": "14 Petición sin token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código 401', () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/clientes",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "clientes"
+              ]
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          }
+        },
+        {
+          "name": "15 Token modificado o inventado",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código 401', () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/clientes",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "clientes"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiJ9.inventado.firma-falsa",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "16 GET con rol que solo consulta (produccion)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/clientes",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "clientes"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_produccion}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "17 POST con rol sin permiso (produccion)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/clientes",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "clientes"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Agro Sur\",\n  \"nit\": \"900777888-1\",\n  \"email\": \"ferre@central.com\",\n  \"telefono\": \"3151112233\",\n  \"ciudad\": \"Palmira\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_produccion}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "18 POST con rol con permiso (comercial)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código 201', () => pm.response.to.have.status(201));",
+                  "if (pm.response.code === 201) pm.collectionVariables.set('id_caso18', pm.response.json().id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/clientes",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "clientes"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Agro Sur\",\n  \"nit\": \"900777888-1\",\n  \"email\": \"ferre@central.com\",\n  \"telefono\": \"3151112233\",\n  \"ciudad\": \"Palmira\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_comercial}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "18b Limpiar: eliminar el cliente del caso 18",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código 204', () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/clientes/{{id_caso18}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "clientes",
+                "{{id_caso18}}"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Semana 2 · Relaciones (ms-clientes es consultado)",
+      "item": [
+        {
+          "name": "R1 GET /clientes/1 (lo usa ms-pedidos para validar)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/clientes/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "clientes",
+                "1"
+              ]
+            }
+          }
+        },
+        {
+          "name": "R2 GET /clientes?ids=1,2 (lo usa ms-pedidos para componer)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/clientes?ids=1,2",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "clientes"
+              ],
+              "query": [
+                {
+                  "key": "ids",
+                  "value": "1,2"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "R3 Crear pedido (ms-pedidos valida en ms-clientes)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código 201', () => pm.response.to.have.status(201));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/pedidos",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "pedidos"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cliente_id\": 1,\n  \"producto_id\": 2,\n  \"cantidad\": 50,\n  \"centro_distribucion\": \"Cali\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "R4 Listar pedidos (ms-pedidos compone con ms-clientes)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/pedidos",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "pedidos"
+              ]
+            }
+          }
+        },
+        {
+          "name": "R5 Crear lote (ms-lotes valida en ms-productos)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código 201', () => pm.response.to.have.status(201));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/lotes",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "lotes"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigo_lote\": \"L-{{$timestamp}}\",\n  \"producto_id\": 1,\n  \"fecha_produccion\": \"2026-11-10\",\n  \"cantidad\": 200,\n  \"resultado_calidad\": \"pendiente\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "R6 Listar lotes (ms-lotes compone con ms-productos)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/lotes",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "lotes"
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://app.agrored.local/api"
+    },
+    {
+      "key": "token",
+      "value": ""
+    },
+    {
+      "key": "token_comercial",
+      "value": ""
+    },
+    {
+      "key": "token_produccion",
+      "value": ""
+    },
+    {
+      "key": "nuevo_id",
+      "value": "4"
+    },
+    {
+      "key": "usuarios_url",
+      "value": "http://app.agrored.local/api"
+    },
+    {
+      "key": "id_caso18",
+      "value": ""
+    }
+  ]
+}
