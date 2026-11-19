@@ -1,11 +1,17 @@
 // =====================================================================
 // PANTALLA DE PEDIDOS (responsable: María Paula Zambrano · ms-pedidos)
-// Lista, filtra por estado, crea, edita y elimina pedidos.
-// Cada pedido guarda solo cliente_id y producto_id; los nombres se
-// muestran con las listas de clientes y productos (o con los objetos
-// cliente y producto que compone la API real).
+// Lista, filtra por estado, crea, edita y elimina pedidos con la API real.
+//
+// La lista hace UNA sola petición: GET /api/pedidos. ms-pedidos entrega
+// cada pedido ya compuesto con su objeto cliente y su objeto producto
+// (o null más un aviso si ms-clientes o ms-productos no respondieron).
+// El frontend muestra esos datos tal como llegan: no une nada por su cuenta.
+// Las listas de clientes y productos solo se piden al abrir el formulario,
+// para llenar los selectores.
+//
 // Los botones de crear, editar y eliminar solo aparecen para
-// administrador y comercial. produccion solo consulta.
+// administrador y comercial. produccion solo consulta (y si pidiera la
+// operación, el 403 de la API se muestra como mensaje).
 // =====================================================================
 pintarEncabezado('pedidos.html');
 const PUEDE_EDITAR = Sesion.puedeEditar('pedidos');
@@ -13,13 +19,14 @@ const CENTROS = ['Bogotá', 'Cali'];
 const ESTADOS = ['recibido', 'despachado', 'entregado'];
 
 let pedidos = [];        // lista cargada desde Api.listar('pedidos')
-let clientes = [];       // para el selector y para mostrar el nombre
-let productos = [];
+let clientes = [];       // solo para el selector del formulario
+let productos = [];      // solo para el selector del formulario
 let idEditando = null;   // null = creando; un número = editando ese pedido
 
 const tabla = document.getElementById('cuerpo-tabla');
 const filtro = document.getElementById('filtro-estado');
 const aviso = document.getElementById('aviso');
+const mensaje = document.getElementById('mensaje');
 const ventana = document.getElementById('ventana');
 const formulario = document.getElementById('formulario');
 const errores = document.getElementById('errores');
@@ -37,30 +44,28 @@ document.getElementById('cancelar').addEventListener('click', cerrarFormulario);
 formulario.addEventListener('submit', guardar);
 cargar();
 
+// Mensaje de error visible en la página (400, 403, 409, 503...)
+function mostrarMensaje(texto) {
+  mensaje.textContent = texto;
+  mensaje.style.display = texto ? 'block' : 'none';
+}
+
 async function cargar() {
   try {
-    [pedidos, clientes, productos] = await Promise.all([
-      Api.listar('pedidos'),
-      Api.listar('clientes'),
-      Api.listar('productos'),
-    ]);
+    pedidos = await Api.listar('pedidos'); // una sola petición
+    mostrarMensaje('');
   } catch (error) {
-    tabla.innerHTML = `<tr><td class="vacio" colspan="8">No se pudo cargar: ${escapar(error.message)}</td></tr>`;
-    return;
+    pedidos = [];
+    mostrarMensaje(error.message);
   }
-  pintarSelectores();
   pintarTabla();
 }
 
-// ---- Nombres (la lista actual manda; si no está, el objeto compuesto por la API)
-function nombreCliente(p) {
-  const c = clientes.find((x) => x.id === p.cliente_id);
-  return c ? c.nombre : (p.cliente ? p.cliente.nombre : `Cliente #${p.cliente_id}`);
-}
-
-function nombreProducto(p) {
-  const x = productos.find((y) => y.id === p.producto_id);
-  return x ? x.nombre : (p.producto ? p.producto.nombre : `Producto #${p.producto_id}`);
+// ---- Datos relacionados: exactamente lo que entrega el backend
+function textoRelacionado(objeto) {
+  return objeto
+    ? escapar(objeto.nombre)
+    : '<span style="color:#888;font-style:italic">no disponible</span>';
 }
 
 // ---- Lista
@@ -78,8 +83,8 @@ function pintarTabla() {
   tabla.innerHTML = visibles.map((p) => `
     <tr>
       <td data-titulo="N.º">${p.id}</td>
-      <td data-titulo="Cliente">${escapar(nombreCliente(p))}</td>
-      <td data-titulo="Producto">${escapar(nombreProducto(p))}</td>
+      <td data-titulo="Cliente">${textoRelacionado(p.cliente)}</td>
+      <td data-titulo="Producto">${textoRelacionado(p.producto)}</td>
       <td data-titulo="Cantidad">${escapar(p.cantidad)}</td>
       <td data-titulo="Centro">${escapar(p.centro_distribucion)}</td>
       <td data-titulo="Estado"><span class="estado ${p.estado === 'entregado' ? 'activo' : ''}">${escapar(p.estado)}</span></td>
@@ -93,20 +98,38 @@ function pintarTabla() {
 }
 
 // ---- Formulario (crear y editar)
-function pintarSelectores() {
-  document.getElementById('cliente_id').innerHTML = clientes
-    .map((c) => `<option value="${c.id}">${escapar(c.nombre)}</option>`).join('');
-  document.getElementById('producto_id').innerHTML = productos
-    .map((p) => `<option value="${p.id}">${escapar(p.nombre)}</option>`).join('');
+// Los clientes y productos se piden aquí, solo para llenar los selectores.
+async function cargarOpciones() {
+  [clientes, productos] = await Promise.all([
+    Api.listar('clientes'),
+    Api.listar('productos'),
+  ]);
 }
 
-function abrirFormulario(id) {
+function pintarSelectores(pedido) {
+  // Se ofrecen los activos; en una edición se conserva el que ya tenía el pedido
+  const opciones = (lista, idActual) => lista
+    .filter((x) => x.activo !== false || x.id === idActual)
+    .map((x) => `<option value="${x.id}">${escapar(x.nombre)}</option>`).join('');
+  document.getElementById('cliente_id').innerHTML = opciones(clientes, pedido && pedido.cliente_id);
+  document.getElementById('producto_id').innerHTML = opciones(productos, pedido && pedido.producto_id);
+}
+
+async function abrirFormulario(id) {
   idEditando = id;
-  const p = pedidos.find((x) => x.id === id)
-    || { cliente_id: '', producto_id: '', cantidad: '', centro_distribucion: CENTROS[0], estado: 'recibido' };
+  const p = pedidos.find((x) => x.id === id) || null;
+  try {
+    await cargarOpciones();
+  } catch (error) {
+    mostrarMensaje(`No se pudieron cargar los clientes y productos para el formulario. ${error.message}`);
+    return;
+  }
+  mostrarMensaje('');
+  pintarSelectores(p);
+  const base = p || { cliente_id: clientes[0] ? clientes[0].id : '', producto_id: productos[0] ? productos[0].id : '', cantidad: '', centro_distribucion: CENTROS[0], estado: 'recibido' };
   document.getElementById('titulo-formulario').textContent = id ? `Editar pedido ${id}` : 'Nuevo pedido';
   for (const campo of ['cliente_id', 'producto_id', 'cantidad', 'centro_distribucion', 'estado']) {
-    document.getElementById(campo).value = p[campo];
+    document.getElementById(campo).value = base[campo];
   }
   errores.textContent = '';
   ventana.classList.add('abierta');
@@ -144,6 +167,19 @@ function ahoraTexto() {
   return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`;
 }
 
+// Solo con datos de ejemplo (Taller 2): no hay API que ponga las fechas ni
+// que componga el cliente y el producto, así que se simulan.
+function camposSimulados(datos, actual) {
+  const cliente = clientes.find((c) => c.id === datos.cliente_id);
+  const producto = productos.find((p) => p.id === datos.producto_id);
+  return {
+    created_at: actual ? actual.created_at : ahoraTexto(),
+    updated_at: ahoraTexto(),
+    cliente: cliente ? { id: cliente.id, nombre: cliente.nombre } : null,
+    producto: producto ? { id: producto.id, nombre: producto.nombre } : null,
+  };
+}
+
 async function guardar(evento) {
   evento.preventDefault();
   const datos = leerFormulario();
@@ -153,17 +189,17 @@ async function guardar(evento) {
     return;
   }
   try {
+    const actual = idEditando ? pedidos.find((p) => p.id === idEditando) : null;
+    const envio = CONFIG.USAR_DATOS_EJEMPLO ? { ...datos, ...camposSimulados(datos, actual) } : datos;
     if (idEditando) {
-      const actual = pedidos.find((p) => p.id === idEditando);
-      // Con datos de ejemplo no hay API que ponga las fechas; con la API real las ignora
-      await Api.actualizar('pedidos', idEditando, { ...datos, created_at: actual.created_at, updated_at: ahoraTexto() });
+      await Api.actualizar('pedidos', idEditando, envio); // PUT: el pedido completo
     } else {
-      await Api.crear('pedidos', { ...datos, created_at: ahoraTexto(), updated_at: ahoraTexto() });
+      await Api.crear('pedidos', envio);
     }
     cerrarFormulario();
     await cargar();
   } catch (error) {
-    errores.textContent = error.message; // por ejemplo el 400 "No existe el cliente con id X" o el 503 de la API
+    errores.textContent = error.message; // 400 (por ejemplo "No existe el cliente con id X"), 403, 503...
   }
 }
 
@@ -174,6 +210,6 @@ async function eliminar(id) {
     await Api.eliminar('pedidos', id);
     await cargar();
   } catch (error) {
-    alert(error.message);
+    mostrarMensaje(error.message);
   }
 }
