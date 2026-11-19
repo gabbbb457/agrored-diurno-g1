@@ -30,7 +30,14 @@ formulario.addEventListener('submit', guardar);
 cargar();
 
 async function cargar() {
-  clientes = await Api.listar('clientes');
+  try {
+    clientes = await Api.listar('clientes'); // una sola petición: GET /api/clientes
+  } catch (error) {
+    // Por ejemplo 503 si ms-clientes está detenido: la pantalla avisa y no se cae
+    clientes = [];
+    tabla.innerHTML = `<tr><td class="vacio error" colspan="7">${escapar(error.message)}</td></tr>`;
+    return;
+  }
   pintarFiltroCiudades();
   pintarTabla();
 }
@@ -137,6 +144,6 @@ async function eliminar(id) {
     await Api.eliminar('clientes', id);
     await cargar();
   } catch (error) {
-    alert(error.message);
+    alert(error.message); // por ejemplo el 403 o el 503 que responde la API
   }
 }
