@@ -4,18 +4,18 @@
 // =====================================================================
 const ROLES_QUE_ESCRIBEN = ['administrador', 'produccion'];
 
-// La sesión se lee directo de sessionStorage (claves "token" y "usuario"),
-// así no depende de funciones que el frontend compartido no tenga.
-const sesion = (() => {
-  const token = sessionStorage.getItem('token');
-  let usuario = {};
-  try { usuario = JSON.parse(sessionStorage.getItem('usuario')) || {}; } catch (e) { /* sin usuario */ }
-  return { token, nombre: usuario.nombre, rol: usuario.rol };
-})();
-
-if (typeof cerrarSesion !== 'function') {
-  window.cerrarSesion = () => { sessionStorage.clear(); location.href = '/login.html'; };
+// Puente con el frontend compartido (js/sesion.js y js/api.js)
+function obtenerSesion() {
+  const s = Sesion.leer() || {};
+  return { token: s.token, rol: s.rol, nombre: s.nombre || (s.usuario && s.usuario.nombre) };
 }
+function cerrarSesion() { Sesion.cerrar(); }
+async function api(ruta, opciones = {}) {
+  const cuerpo = opciones.body ? JSON.parse(opciones.body) : undefined;
+  return pedirApi(opciones.method || 'GET', ruta, cuerpo);
+}
+
+const sesion = obtenerSesion();
 if (!sesion.token) cerrarSesion(); // sin sesión: de vuelta al inicio de sesión
 const puedeEscribir = ROLES_QUE_ESCRIBEN.includes(sesion.rol);
 
