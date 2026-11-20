@@ -25,7 +25,6 @@ async function existeProducto(id, token) {
   }
   return true;
 }
-
 // COMPOSICIÓN: varios productos en UNA petición. Devuelve un Map id -> producto,
 // o null si ms-productos no responde.
 async function productosPorIds(ids, token) {
@@ -35,5 +34,4 @@ async function productosPorIds(ids, token) {
   const productos = await respuesta.json();
   return new Map(productos.map((p) => [p.id, { id: p.id, nombre: p.nombre }]));
 }
-
 module.exports = { existeProducto, productosPorIds };
