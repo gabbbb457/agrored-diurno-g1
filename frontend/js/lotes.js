@@ -4,7 +4,18 @@
 // =====================================================================
 const ROLES_QUE_ESCRIBEN = ['administrador', 'produccion'];
 
-const sesion = obtenerSesion();
+// La sesión se lee directo de sessionStorage (claves "token" y "usuario"),
+// así no depende de funciones que el frontend compartido no tenga.
+const sesion = (() => {
+  const token = sessionStorage.getItem('token');
+  let usuario = {};
+  try { usuario = JSON.parse(sessionStorage.getItem('usuario')) || {}; } catch (e) { /* sin usuario */ }
+  return { token, nombre: usuario.nombre, rol: usuario.rol };
+})();
+
+if (typeof cerrarSesion !== 'function') {
+  window.cerrarSesion = () => { sessionStorage.clear(); location.href = '/login.html'; };
+}
 if (!sesion.token) cerrarSesion(); // sin sesión: de vuelta al inicio de sesión
 const puedeEscribir = ROLES_QUE_ESCRIBEN.includes(sesion.rol);
 
@@ -179,11 +190,12 @@ async function eliminar(lote) {
 }
 
 // ---------- Arranque ----------
-el.usuario.textContent = `${sesion.nombre} · ${sesion.rol}`;
+// El encabezado (nombre, rol y salir) lo pinta layout.js; estos elementos son opcionales.
+if (el.usuario) el.usuario.textContent = `${sesion.nombre} · ${sesion.rol}`;
 // Ocultar el botón es solo comodidad: el microservicio igual responde 403 si el rol no puede.
 el.nuevo.hidden = !puedeEscribir;
 
-el.salir.addEventListener('click', cerrarSesion);
+if (el.salir) el.salir.addEventListener('click', cerrarSesion);
 el.filtro.addEventListener('change', cargar);
 el.nuevo.addEventListener('click', () => abrirFormulario(null));
 el.cancelar.addEventListener('click', () => el.dialogo.close());
