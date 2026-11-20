@@ -1,10 +1,8 @@
 // =====================================================================
 // Pantalla de lotes: listar, crear, editar y eliminar.
-// Solo habla con la API a través de "api" (js/api.js).
 // =====================================================================
 const ROLES_QUE_ESCRIBEN = ['administrador', 'produccion'];
 
-// Puente con el frontend compartido (js/sesion.js y js/api.js)
 function obtenerSesion() {
   const s = Sesion.leer() || {};
   return { token: s.token, rol: s.rol, nombre: s.nombre || (s.usuario && s.usuario.nombre) };
@@ -16,7 +14,7 @@ async function api(ruta, opciones = {}) {
 }
 
 const sesion = obtenerSesion();
-if (!sesion.token) cerrarSesion(); // sin sesión: de vuelta al inicio de sesión
+if (!sesion.token) cerrarSesion();
 const puedeEscribir = ROLES_QUE_ESCRIBEN.includes(sesion.rol);
 
 const el = {
@@ -39,9 +37,8 @@ const el = {
   calidad: document.getElementById('resultado_calidad'),
 };
 
-let idEnEdicion = null; // null = creando; número = editando ese lote
+let idEnEdicion = null;
 
-// ---------- Mensajes ----------
 function mostrar(caja, mensaje, detalles = []) {
   caja.textContent = [mensaje, ...detalles].join(' · ');
   caja.hidden = false;
@@ -52,7 +49,6 @@ function ocultar(caja) {
   caja.textContent = '';
 }
 
-// Traduce el código de estado a un mensaje claro para la persona
 function manejarError(error, caja = el.aviso) {
   if (error.status === 401) {
     mostrar(caja, 'Tu sesión venció. Vuelve a iniciar sesión.');
@@ -70,7 +66,6 @@ function manejarError(error, caja = el.aviso) {
   }
 }
 
-// ---------- Lista ----------
 function crearCelda(texto, clase) {
   const td = document.createElement('td');
   td.textContent = texto;
@@ -90,23 +85,23 @@ function crearBoton(texto, clase, alHacerClic) {
 function dibujarFila(lote) {
   const tr = document.createElement('tr');
   tr.appendChild(crearCelda(lote.codigo_lote));
-  // El nombre del producto lo compone el backend: no se pide a ms-productos desde aquí.
   tr.appendChild(crearCelda(lote.producto ? lote.producto.nombre : `Producto ${lote.producto_id} (sin datos)`));
   tr.appendChild(crearCelda(lote.fecha_produccion));
   tr.appendChild(crearCelda(lote.cantidad, 'num'));
 
   const calidad = document.createElement('td');
   const etiqueta = document.createElement('span');
-  etiqueta.className = `etiqueta ${lote.resultado_calidad}`;
+  const claseEstado = lote.resultado_calidad === 'aprobado' ? 'activo' : (lote.resultado_calidad === 'rechazado' ? 'inactivo' : '');
+  etiqueta.className = `estado ${claseEstado}`;
   etiqueta.textContent = lote.resultado_calidad;
   calidad.appendChild(etiqueta);
   tr.appendChild(calidad);
 
   const acciones = document.createElement('td');
-  acciones.className = 'col-acciones';
+  acciones.className = 'nowrap';
   if (puedeEscribir) {
-    acciones.appendChild(crearBoton('Editar', 'btn pequeno secundario', () => abrirFormulario(lote)));
-    acciones.appendChild(crearBoton('Eliminar', 'btn pequeno peligro', () => eliminar(lote)));
+    acciones.appendChild(crearBoton('Editar', 'boton pequeno secundario', () => abrirFormulario(lote)));
+    acciones.appendChild(crearBoton('Eliminar', 'boton pequeno peligro', () => eliminar(lote)));
   }
   tr.appendChild(acciones);
   return tr;
@@ -117,7 +112,7 @@ async function cargar() {
   try {
     const consulta = el.filtro.value ? `?resultado_calidad=${encodeURIComponent(el.filtro.value)}` : '';
     const lotes = await api(`/lotes${consulta}`);
-    if (!lotes) return; // sesión vencida: api() ya redirigió al login
+    if (!lotes) return;
     el.tabla.replaceChildren(...lotes.map(dibujarFila));
     el.vacio.hidden = lotes.length > 0;
     if (lotes.some((l) => l.aviso)) {
@@ -128,7 +123,6 @@ async function cargar() {
   }
 }
 
-// ---------- Formulario ----------
 async function llenarProductos() {
   try {
     const productos = await api('/productos');
@@ -153,7 +147,11 @@ function abrirFormulario(lote) {
   el.fecha.value = lote ? lote.fecha_produccion : '';
   el.cantidad.value = lote ? lote.cantidad : '';
   el.calidad.value = lote ? lote.resultado_calidad : 'pendiente';
-  el.dialogo.showModal();
+  el.dialogo.classList.add('abierta');
+}
+
+function cerrarFormulario() {
+  el.dialogo.classList.remove('abierta');
 }
 
 async function guardar(evento) {
@@ -172,7 +170,7 @@ async function guardar(evento) {
     } else {
       await api(`/lotes/${idEnEdicion}`, { method: 'PUT', body: JSON.stringify(datos) });
     }
-    el.dialogo.close();
+    cerrarFormulario();
     await cargar();
   } catch (error) {
     manejarError(error, el.erroresForm);
@@ -189,16 +187,13 @@ async function eliminar(lote) {
   }
 }
 
-// ---------- Arranque ----------
-// El encabezado (nombre, rol y salir) lo pinta layout.js; estos elementos son opcionales.
 if (el.usuario) el.usuario.textContent = `${sesion.nombre} · ${sesion.rol}`;
-// Ocultar el botón es solo comodidad: el microservicio igual responde 403 si el rol no puede.
 el.nuevo.hidden = !puedeEscribir;
 
 if (el.salir) el.salir.addEventListener('click', cerrarSesion);
 el.filtro.addEventListener('change', cargar);
 el.nuevo.addEventListener('click', () => abrirFormulario(null));
-el.cancelar.addEventListener('click', () => el.dialogo.close());
+el.cancelar.addEventListener('click', cerrarFormulario);
 el.form.addEventListener('submit', guardar);
 
 llenarProductos().then(cargar);
