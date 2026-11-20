@@ -5,21 +5,83 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>AgroRed · Lotes</title>
   <link rel="stylesheet" href="css/estilos.css">
+  <link rel="stylesheet" href="css/lotes.css">
 </head>
 <body>
   <header id="encabezado"></header>
   <main>
     <h1>Lotes</h1>
-    <p class="subtitulo">Pantalla en construcción · responsable: Gabriela Mellizo</p>
-    <div class="tarjeta">
-      <p>Esta página ya tiene el encabezado, el menú y la sesión. Su responsable reemplaza este bloque por la lista, el formulario y los botones según el rol. Puede tomar como modelo <a href="clientes.html">clientes.html</a> y <code>js/clientes.js</code>.</p>
+    <p class="subtitulo">Lotes de producción</p>
+
+    <div id="aviso" class="aviso" role="alert" hidden></div>
+
+    <div class="barra">
+      <label>Resultado de calidad
+        <select id="filtro">
+          <option value="">Todos</option>
+          <option value="pendiente">Pendiente</option>
+          <option value="aprobado">Aprobado</option>
+          <option value="rechazado">Rechazado</option>
+        </select>
+      </label>
+      <button type="button" id="btn-nuevo" class="btn" hidden>Nuevo lote</button>
     </div>
+
+    <div class="tabla-envoltorio">
+      <table>
+        <thead>
+          <tr>
+            <th>Código</th>
+            <th>Producto</th>
+            <th>Fecha de producción</th>
+            <th class="num">Cantidad</th>
+            <th>Calidad</th>
+            <th class="col-acciones">Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="tabla-lotes"></tbody>
+      </table>
+    </div>
+    <p id="vacio" class="vacio" hidden>No hay lotes para mostrar.</p>
   </main>
+
+  <dialog id="dialogo">
+    <form id="formulario" method="dialog" novalidate>
+      <h2 id="titulo-form">Nuevo lote</h2>
+      <div id="errores-form" class="aviso" role="alert" hidden></div>
+
+      <label>Código del lote
+        <input id="codigo_lote" name="codigo_lote" required maxlength="30">
+      </label>
+      <label>Producto
+        <select id="producto_id" name="producto_id" required></select>
+      </label>
+      <label>Fecha de producción
+        <input id="fecha_produccion" name="fecha_produccion" type="date" required>
+      </label>
+      <label>Cantidad
+        <input id="cantidad" name="cantidad" type="number" min="1" step="1" required>
+      </label>
+      <label>Resultado de calidad
+        <select id="resultado_calidad" name="resultado_calidad" required>
+          <option value="pendiente">Pendiente</option>
+          <option value="aprobado">Aprobado</option>
+          <option value="rechazado">Rechazado</option>
+        </select>
+      </label>
+
+      <div class="acciones-form">
+        <button type="button" id="btn-cancelar" class="btn secundario">Cancelar</button>
+        <button type="submit" class="btn">Guardar</button>
+      </div>
+    </form>
+  </dialog>
 
   <script src="js/config.js"></script>
   <script src="js/sesion.js"></script>
   <script src="js/api.js"></script>
   <script src="js/layout.js"></script>
   <script>pintarEncabezado('lotes.html');</script>
+  <script src="js/lotes.js"></script>
 </body>
 </html>

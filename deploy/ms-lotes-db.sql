@@ -1,0 +1,3 @@
+CREATE DATABASE lotes_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE USER 'lotes_user'@'172.17.1.19' IDENTIFIED BY 'CLAVE_DE_PRODUCCION';
+GRANT ALL PRIVILEGES ON lotes_db.* TO 'lotes_user'@'172.17.1.19';
