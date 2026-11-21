@@ -52,6 +52,8 @@ y en `JWT_SECRET` la clave del grupo. El archivo `.env` no se sube al repositori
 | DB_PASSWORD | Clave del usuario | (la suya) |
 | JWT_SECRET | Clave con la que se verifican los tokens; **la misma en todos los microservicios del grupo** | (la del grupo, no se sube) |
 
+En el equipo de desarrollo `DB_HOST` es `localhost`; en servidor2 es la dirección de servidor1 (172.17.1.18).
+
 Prueben en el navegador: http://localhost:3002/health (público). Las rutas `/productos` exigen token,
 así que desde el navegador responden 401: se prueban en Postman (ver **Pruebas**).
 
@@ -89,6 +91,7 @@ Authorization: Bearer <token>
 El token se obtiene en ms-usuarios con `POST http://localhost:3001/usuarios/login` y
 `{"email": "...", "password": "..."}`. Lleva `{ id, nombre, rol }` y ms-productos verifica su firma con
 `JWT_SECRET`, sin consultar a ms-usuarios. `/health` es público.
+Detrás del gateway es `POST http://app.agrored.com/api/usuarios/login`.
 
 | Operación | administrador | produccion | comercial |
 |---|---|---|---|
@@ -157,12 +160,29 @@ ms-productos **no guarda referencias** a otros microservicios: es un servicio co
 - `GET /productos?ids=…` lo usan al consultar para **componer** sus respuestas con el nombre del producto, en una sola petición.
 - Ambos reenvían el token del usuario en la cabecera `Authorization`, porque ms-productos también lo exige.
 
+## Despliegue
+
+En el entorno desplegado (servidor1 y servidor2) este microservicio funciona así:
+
+- La base `productos_db` está en MySQL de servidor1 y el usuario `productos_user` solo puede conectarse desde servidor2 (172.17.1.19). Se crean con `deploy/db-productos.sql`, que no incluye la contraseña real.
+- Corre en servidor2 como servicio de systemd (`deploy/ms-productos.service`), con el usuario `nodeapps`, en `/srv/agrored/app/ms-productos`.
+- Escucha solo en `127.0.0.1:3002`; desde fuera se llega únicamente por el gateway Apache en `http://app.agrored.com/api/productos`.
+- Su configuración (`DB_HOST` con la dirección de servidor1, `DB_PASSWORD` y `JWT_SECRET`) está en un `.env` con permisos 640 y grupo `nodeapps`, que no se sube al repositorio.
+
+Comandos útiles en servidor2:
+
+```
+sudo systemctl status ms-productos
+sudo journalctl -u ms-productos -f
+sudo systemctl restart ms-productos   # después de cambiar el .env
+```
+
 ## Pruebas
 
 Colección de Postman en `docs/ms-productos.postman_collection.json` (Collection v2.1):
 
 1. En Postman: **Import** → seleccionar el archivo.
-2. Tener corriendo ms-usuarios (3001, con `ROLES=administrador,comercial,produccion`) y ms-productos (3002), con la misma `JWT_SECRET`.
+2. Tener corriendo ms-usuarios (con `ROLES=administrador,comercial,produccion`) y ms-productos, con la misma `JWT_SECRET`. Las variables de URL de la colección apuntan al gateway (`http://app.agrored.com/api`); para probar en el equipo de desarrollo, cámbienlas a `http://127.0.0.1:3001`, `http://127.0.0.1:3002`, etc.
 3. Correr primero la carpeta **0 · Preparar tokens** (login de administrador, crea los usuarios comercial y produccion y guarda sus tokens).
 4. Correr las demás carpetas en orden. La carpeta de relaciones necesita además ms-clientes, ms-pedidos y ms-lotes corriendo.
 
