@@ -2,16 +2,16 @@
 
 AgroRed S.A. · Grupo 1 · Jornada diurna · Redes y Servicios Multimedia · Módulo 3 · UAO
 
-Aplicación web de AgroRed S.A. (agroindustria y distribución) que gestiona productos, clientes, pedidos y lotes de producción mediante microservicios REST en Node.js y Express, organizados en capas. En el Taller 3 los microservicios, el frontend y la base de datos quedaron desplegados en dos servidores y se acceden a través de un gateway Apache.
+Aplicación web de AgroRed S.A. (agroindustria y distribución) que gestiona productos, clientes, pedidos y lotes de producción mediante microservicios REST en Node.js y Express, organizados en capas. Los microservicios, el frontend y las bases de datos se despliegan en dos servidores y se acceden a través de un gateway Apache.
 
 ## Integrantes
 
-| Integrante | GitHub | Microservicio | Rol en el Taller 3 |
-|---|---|---|---|
-| Daniela Valverde | Danix5925 | ms-productos | Integradora de aplicación |
-| Miguel Ángel Vanegas | MDvanegas | ms-clientes | Documentador |
-| María Paula Zambrano | ccdfmck | ms-pedidos | Integradora de datos |
-| Gabriela Mellizo | gabbbb457 | ms-lotes | Arquitecta |
+| Integrante | GitHub | Microservicio |
+|---|---|---|
+| Daniela Valverde | Danix5925 | ms-productos |
+| Miguel Ángel Vanegas | MDvanegas | ms-clientes |
+| María Paula Zambrano | ccdfmck | ms-pedidos |
+| Gabriela Mellizo | gabbbb457 | ms-lotes |
 
 ## Tabla de microservicios
 
@@ -28,13 +28,13 @@ Las dependencias son referencias por id que se validan por REST entre microservi
 ## Estructura del repositorio
 
 - `README.md`: este archivo.
-- `ms-usuarios/`: microservicio de usuarios entregado por la docente (en el Taller 3 solo se ajustaron los roles de AgroRed en su `.env.example`).
+- `ms-usuarios/`: microservicio de usuarios entregado por la docente; no se modifica, salvo los roles de AgroRed en su `.env.example`.
 - `ms-productos/`, `ms-clientes/`, `ms-pedidos/`, `ms-lotes/`: un microservicio por integrante, cada uno en su carpeta.
 - `frontend/`: interfaz web (HTML, CSS y JavaScript sin frameworks). Usa la API a través del gateway (`/api`). Más detalles en `frontend/README.md`.
 - `deploy/`: archivos de despliegue: el host virtual de Apache (`app.conf`), un servicio de systemd por microservicio (`ms-*.service`) y los scripts SQL que crean las bases y los usuarios de MySQL (`db-productos.sql`, `ms-lotes-db.sql`). No contienen contraseñas.
 - `postman/` y la carpeta `docs/` o `postman/` de cada microservicio: colecciones de Postman con las pruebas.
 
-## Arquitectura de despliegue (Taller 3)
+## Arquitectura de despliegue
 
 | Equipo | IP | Qué corre |
 |---|---|---|
@@ -46,7 +46,7 @@ Las dependencias son referencias por id que se validan por REST entre microservi
 - Cada microservicio tiene su propia base en MySQL (servidor1) y su propio usuario, que solo puede conectarse desde servidor2. El puerto 3306 no se alcanza desde otros equipos.
 - Los servicios corren con un usuario sin privilegios (`nodeapps`), leen su configuración de un archivo `.env` (no se sube al repositorio) y se reinician solos si fallan.
 - Todos los microservicios verifican los tokens JWT con la misma clave (`JWT_SECRET`), que se define en cada `.env`.
-- Roles: `administrador`, `comercial` y `produccion`. Cada pantalla y cada ruta aplica la tabla de permisos del grupo.
+- Roles de usuario: `administrador`, `comercial` y `produccion`. Cada pantalla y cada ruta aplica la tabla de permisos del grupo.
 - El gateway no publica `/api/health`; cada microservicio tiene su propio `/health` en su puerto (solo accesible desde servidor2).
 
 ## Cómo ejecutar un microservicio en un equipo de desarrollo
