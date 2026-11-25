@@ -1,301 +1,934 @@
- {
-  "auth": {
-    "bearer": [
-      {
-        "key": "token",
-        "type": "string",
-        "value": "{{auth_secret_17xd}}"
-      }
-    ],
-    "type": "bearer"
-  },
+{
   "info": {
-    "_exporter_id": "48922100",
-    "_postman_id": "e8e0d3cc-7719-489a-98f8-9a31400c706a",
-    "name": "ms-lotes",
+    "name": "ms-lotes (Taller 3, por el gateway)",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
     {
-      "name": "health",
-      "request": {
-        "header": [],
-        "method": "GET",
-        "url": {
-          "host": [
-            "localhost"
-          ],
-          "path": [
-            "health"
-          ],
-          "port": "3005",
-          "protocol": "http",
-          "raw": "http://localhost:3005/health"
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "listarr",
-      "request": {
-        "header": [],
-        "method": "GET",
-        "url": {
-          "host": [
-            "localhost"
-          ],
-          "path": [
-            "lotes"
-          ],
-          "port": "3005",
-          "protocol": "http",
-          "raw": "http://localhost:3005/lotes"
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Obtener existente",
-      "request": {
-        "header": [],
-        "method": "GET",
-        "url": {
-          "host": [
-            "localhost"
-          ],
-          "path": [
-            "lotes",
-            "1"
-          ],
-          "port": "3005",
-          "protocol": "http",
-          "raw": "http://localhost:3005/lotes/1"
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "No existe",
-      "request": {
-        "header": [],
-        "method": "GET",
-        "url": {
-          "host": [
-            "localhost"
-          ],
-          "path": [
-            "lotes",
-            "999"
-          ],
-          "port": "3005",
-          "protocol": "http",
-          "raw": "http://localhost:3005/lotes/999"
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "lotesAprobados",
-      "request": {
-        "body": {
-          "mode": "raw",
-          "options": {
-            "raw": {
-              "language": "json"
+      "name": "0. Inicio de sesión (guarda los tokens)",
+      "item": [
+        {
+          "name": "Login administrador",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{admin_email}}\",\n  \"password\": \"{{admin_password}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/usuarios/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "usuarios",
+                "login"
+              ]
             }
           },
-          "raw": "{\r\n  \"codigo_lote\": \"L-2026-004\",\r\n  \"producto_id\": 2,\r\n  \"fecha_produccion\": \"2026-10-25\",\r\n  \"cantidad\": 250,\r\n  \"resultado_calidad\": \"pendiente\"\r\n}"
-        },
-        "header": [],
-        "method": "GET",
-        "url": {
-          "host": [
-            "localhost"
-          ],
-          "path": [
-            "lotes"
-          ],
-          "port": "3005",
-          "protocol": "http",
-          "query": [
+          "event": [
             {
-              "key": "resultado_calidad",
-              "value": "aprobado"
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Login 200', () => pm.response.to.have.status(200));",
+                  "const d = pm.response.json();",
+                  "pm.test('Devuelve token', () => pm.expect(d.token).to.be.a('string'));",
+                  "pm.collectionVariables.set('token_admin', d.token);"
+                ]
+              }
             }
-          ],
-          "raw": "http://localhost:3005/lotes?resultado_calidad=aprobado"
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Id no numérico",
-      "request": {
-        "header": [],
-        "method": "GET",
-        "url": {
-          "host": [
-            "localhost"
-          ],
-          "path": [
-            "lotes",
-            "abc"
-          ],
-          "port": "3005",
-          "protocol": "http",
-          "raw": "http://localhost:3005/lotes/abc"
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "crearLote",
-      "request": {
-        "body": {
-          "mode": "raw",
-          "options": {
-            "raw": {
-              "language": "json"
+          ]
+        },
+        {
+          "name": "Login comercial",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{comercial_email}}\",\n  \"password\": \"{{comercial_password}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/usuarios/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "usuarios",
+                "login"
+              ]
             }
           },
-          "raw": "{\r\n  \"codigo_lote\": \"L-2026-009\",\r\n  \"producto_id\": 9,\r\n  \"fecha_produccion\": \"2026-10-25\",\r\n  \"cantidad\": 0,\r\n  \"resultado_calidad\": \"pendiente\"\r\n}"
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Login 200', () => pm.response.to.have.status(200));",
+                  "const d = pm.response.json();",
+                  "pm.test('Devuelve token', () => pm.expect(d.token).to.be.a('string'));",
+                  "pm.collectionVariables.set('token_comercial', d.token);"
+                ]
+              }
+            }
+          ]
         },
-        "header": [],
-        "method": "POST",
-        "url": {
-          "host": [
-            "localhost"
-          ],
-          "path": [
-            "lotes"
-          ],
-          "port": "3005",
-          "protocol": "http",
-          "raw": "http://localhost:3005/lotes"
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "CrearLote",
-      "request": {
-        "body": {
-          "mode": "raw",
-          "options": {
-            "raw": {
-              "language": "json"
+        {
+          "name": "Login produccion",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{produccion_email}}\",\n  \"password\": \"{{produccion_password}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/usuarios/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "usuarios",
+                "login"
+              ]
             }
           },
-          "raw": "{\r\n  \"codigo_lote\": \"L-2026-004\",\r\n  \"producto_id\": 2,\r\n  \"fecha_produccion\": \"2026-10-25\",\r\n  \"cantidad\": 250,\r\n  \"resultado_calidad\": \"pendiente\"\r\n}"
-        },
-        "header": [],
-        "method": "POST",
-        "url": {
-          "host": [
-            "localhost"
-          ],
-          "path": [
-            "lotes"
-          ],
-          "port": "3005",
-          "protocol": "http",
-          "raw": "http://localhost:3005/lotes"
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Login 200', () => pm.response.to.have.status(200));",
+                  "const d = pm.response.json();",
+                  "pm.test('Devuelve token', () => pm.expect(d.token).to.be.a('string'));",
+                  "pm.collectionVariables.set('token_produccion', d.token);"
+                ]
+              }
+            }
+          ]
         }
-      },
-      "response": []
+      ]
     },
     {
-      "name": "CrearLote Copy",
-      "request": {
-        "body": {
-          "mode": "raw",
-          "options": {
-            "raw": {
-              "language": "json"
+      "name": "1. Casos de ms-lotes por el gateway",
+      "item": [
+        {
+          "name": "Caso 14 · 401 sin token",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/lotes",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "lotes"
+              ]
+            },
+            "auth": {
+              "type": "noauth"
             }
           },
-          "raw": "{\r\n  \"codigo_lote\": \"L-2026-004\",\r\n  \"producto_id\": 2,\r\n  \"fecha_produccion\": \"2026-10-25\",\r\n  \"cantidad\": 250,\r\n  \"resultado_calidad\": \"pendiente\"\r\n}"
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código 401', () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ]
         },
-        "header": [],
-        "method": "POST",
-        "url": {
-          "host": [
-            "localhost"
-          ],
-          "path": [
-            "lotes"
-          ],
-          "port": "3005",
-          "protocol": "http",
-          "raw": "http://localhost:3005/lotes"
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Actualizar",
-      "request": {
-        "body": {
-          "mode": "raw",
-          "options": {
-            "raw": {
-              "language": "json"
+        {
+          "name": "Caso 15 · 401 token inválido",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/lotes",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "lotes"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_invalido}}",
+                  "type": "string"
+                }
+              ]
             }
           },
-          "raw": "{\r\n  \"codigo_lote\": \"L-2026-504\",\r\n  \"producto_id\": 8,\r\n  \"fecha_produccion\": \"2026-10-25\",\r\n  \"cantidad\": 250,\r\n  \"resultado_calidad\": \"pendiente\"\r\n}"
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código 401', () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ]
         },
-        "header": [],
-        "method": "PUT",
-        "url": {
-          "host": [
-            "localhost"
-          ],
-          "path": [
-            "lotes",
-            "4"
-          ],
-          "port": "3005",
-          "protocol": "http",
-          "raw": "http://localhost:3005/lotes/4"
+        {
+          "name": "Caso 16 · 200 listar con comercial",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/lotes",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "lotes"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_comercial}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Es una lista', () => pm.expect(pm.response.json()).to.be.an('array'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Filtro ?resultado_calidad=aprobado",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/lotes?resultado_calidad=aprobado",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "lotes"
+              ],
+              "query": [
+                {
+                  "key": "resultado_calidad",
+                  "value": "aprobado"
+                }
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_comercial}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Todos aprobados', () => pm.response.json().forEach(l => pm.expect(l.resultado_calidad).to.eql('aprobado')));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Caso 17 · 403 comercial no puede crear",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/lotes",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "lotes"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_comercial}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigo_lote\": \"{{codigo_nuevo}}\",\n  \"producto_id\": {{producto_id}},\n  \"fecha_produccion\": \"2026-11-01\",\n  \"cantidad\": 10,\n  \"resultado_calidad\": \"pendiente\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('codigo_nuevo', 'L-' + Date.now());"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Caso 18 · 201 produccion crea un lote",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/lotes",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "lotes"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_produccion}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigo_lote\": \"{{codigo_nuevo}}\",\n  \"producto_id\": {{producto_id}},\n  \"fecha_produccion\": \"2026-11-01\",\n  \"cantidad\": 10,\n  \"resultado_calidad\": \"pendiente\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('codigo_nuevo', 'L-' + Date.now());"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código 201', () => pm.response.to.have.status(201));",
+                  "let id = null;",
+                  "try {",
+                  "  const d = pm.response.json();",
+                  "  id = d.id ?? (d.lote && d.lote.id) ?? (d.data && d.data.id) ?? null;",
+                  "} catch (e) { /* sin cuerpo JSON */ }",
+                  "if (id === null) {",
+                  "  const loc = pm.response.headers.get('Location');",
+                  "  if (loc) id = loc.split('/').pop();",
+                  "}",
+                  "pm.test('Se obtuvo el id del lote creado', () => pm.expect(id).to.not.equal(null));",
+                  "if (id !== null) pm.collectionVariables.set('lote_id', String(id));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "409 código de lote repetido",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/lotes",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "lotes"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_admin}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigo_lote\": \"{{codigo_nuevo}}\",\n  \"producto_id\": {{producto_id}},\n  \"fecha_produccion\": \"2026-11-01\",\n  \"cantidad\": 10,\n  \"resultado_calidad\": \"pendiente\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "400 fecha de producción futura",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/lotes",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "lotes"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_admin}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigo_lote\": \"L-FUTURO\",\n  \"producto_id\": {{producto_id}},\n  \"fecha_produccion\": \"2099-01-01\",\n  \"cantidad\": 10,\n  \"resultado_calidad\": \"pendiente\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "400 producto inexistente en ms-productos",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/lotes",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "lotes"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_admin}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigo_lote\": \"L-SINPROD\",\n  \"producto_id\": 999999,\n  \"fecha_produccion\": \"2026-11-01\",\n  \"cantidad\": 10,\n  \"resultado_calidad\": \"pendiente\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "200 obtener el lote creado",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/lotes/{{lote_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "lotes",
+                "{{lote_id}}"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_comercial}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Es el lote creado', () => pm.expect(pm.response.json().codigo_lote).to.eql(pm.collectionVariables.get('codigo_nuevo')));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "404 lote que no existe",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/lotes/999999",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "lotes",
+                "999999"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_comercial}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código 404', () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "400 id no numérico",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/lotes/abc",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "lotes",
+                "abc"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_comercial}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "200 actualizar (produccion)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/lotes/{{lote_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "lotes",
+                "{{lote_id}}"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_produccion}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigo_lote\": \"{{codigo_nuevo}}\",\n  \"producto_id\": {{producto_id}},\n  \"fecha_produccion\": \"2026-11-01\",\n  \"cantidad\": 20,\n  \"resultado_calidad\": \"aprobado\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "403 comercial no puede eliminar",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/lotes/{{lote_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "lotes",
+                "{{lote_id}}"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_comercial}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "204 administrador elimina el lote",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/lotes/{{lote_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "lotes",
+                "{{lote_id}}"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_admin}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código 204', () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "404 después de eliminar",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/lotes/{{lote_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "lotes",
+                "{{lote_id}}"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_admin}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código 404', () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ]
         }
-      },
-      "response": []
-    },
-    {
-      "name": "Actualizar inexistente",
-      "request": {
-        "header": [],
-        "method": "GET",
-        "url": {
-          "raw": ""
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "DELETE",
-      "request": {
-        "header": [],
-        "method": "GET",
-        "url": {
-          "raw": ""
-        }
-      },
-      "response": []
+      ]
     }
   ],
   "variable": [
+    {
+      "key": "base_url",
+      "value": "http://app.agrored.com/api"
+    },
+    {
+      "key": "admin_email",
+      "value": "admin@empresa.com"
+    },
+    {
+      "key": "admin_password",
+      "value": ""
+    },
+    {
+      "key": "comercial_email",
+      "value": "comercial@agrored.com"
+    },
+    {
+      "key": "comercial_password",
+      "value": ""
+    },
+    {
+      "key": "produccion_email",
+      "value": "produccion@agrored.com"
+    },
+    {
+      "key": "produccion_password",
+      "value": ""
+    },
+    {
+      "key": "producto_id",
+      "value": "1"
+    },
+    {
+      "key": "token_invalido",
+      "value": "esto.no.es.un.token"
+    },
+    {
+      "key": "token_admin",
+      "value": ""
+    },
     {
       "key": "token_comercial",
       "value": ""
     },
     {
       "key": "token_produccion",
-      "secret": true
+      "value": ""
     },
     {
-      "key": "token_admin",
-      "secret": true
+      "key": "codigo_nuevo",
+      "value": ""
+    },
+    {
+      "key": "lote_id",
+      "value": ""
     }
   ]
 }
